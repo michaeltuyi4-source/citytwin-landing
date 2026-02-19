@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CityTwin — Preserve your lifestyle when you move</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: "#F4F7FB",
+              100: "#E6EEF7",
+              300: "#9BB8D3",
+              500: "#3B6EA5",
+              600: "#2F5C8F",
+              700: "#244B75",
+              900: "#162F4A"
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+
+<body class="bg-white text-slate-900">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="text-xl font-semibold tracking-tight text-brand-900">CityTwin</div>
+      <a href="#lifestyle-check"
+         class="text-sm font-medium px-5 py-2.5 rounded-full bg-brand-600 text-white hover:bg-brand-700 transition">
+        Take the Lifestyle Check
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative bg-gradient-to-br from-white via-brand-50 to-white">
+    <div class="max-w-6xl mx-auto px-6 py-24 text-center">
+
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+        Moving Soon?<br class="md:hidden">
+        <span class="text-brand-700">Find a Neighborhood That Fits Your Lifestyle.</span>
+      </h1>
+
+      <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-600 leading-relaxed">
+        When you relocate, you shouldn’t lose your routine, your community,
+        or the rhythm of daily life. We’re building a smarter way to help
+        movers land somewhere that already feels like home.
+      </p>
+
+      <div class="mt-10">
+        <a href="#lifestyle-check"
+           class="inline-flex items-center justify-center px-8 py-4 rounded-full bg-brand-600 text-white font-semibold hover:bg-brand-700 transition shadow-sm">
+          Start the Lifestyle Check
+        </a>
+      </div>
+
+      <!-- Refined Trust Strip -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
+          Takes less than a minute
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
+          No long questionnaires
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
+          Help shape the launch
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+        Moving is already overwhelming.
+        <span class="text-slate-600"> Losing your lifestyle makes it worse.</span>
+      </h2>
+      <p class="mt-6 text-lg text-slate-600 leading-relaxed">
+        A new address shouldn’t mean starting your life from scratch.
+        The cafés you love. The markets you trust. The gym you frequent.
+        The people who make it feel familiar, those things matter.
+      </p>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="bg-brand-50 py-24 border-y border-slate-200">
+    <div class="max-w-6xl mx-auto px-6">
+      <h3 class="text-3xl font-bold text-center tracking-tight text-brand-900">How CityTwin Works</h3>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-10">
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-sm uppercase tracking-wide text-slate-500">Step 1</div>
+          <h4 class="mt-2 font-semibold text-lg text-brand-900">Tell us what matters to you</h4>
+          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+            Share a few categories or routines you care about in your next city.
+          </p>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-sm uppercase tracking-wide text-slate-500">Step 2</div>
+          <h4 class="mt-2 font-semibold text-lg text-brand-900">Tell us where you're moving</h4>
+          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+            Enter your destination city so we can understand your context.
+          </p>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-sm uppercase tracking-wide text-slate-500">Step 3</div>
+          <h4 class="mt-2 font-semibold text-lg text-brand-900">See how we’d match you</h4>
+          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
+            Preview how lifestyle-fit neighborhood matching will work.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form Section -->
+  <section id="lifestyle-check" class="py-24">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-brand-900">
+        Help us understand what matters when you move
+      </h3>
+      <p class="mt-4 text-slate-600 leading-relaxed">
+        We’re launching in select cities. Tell us what matters most to you
+        and we’ll notify you when early access opens.
+      </p>
+
+      <div class="mt-12 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm text-left">
+        <form id="waitlistForm" class="space-y-6">
+
+          <div>
+            <label class="text-sm font-medium text-slate-700">What city are you moving to?</label>
+            <input name="city" required
+              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
+              placeholder="Dallas, Atlanta, Charlotte..." />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-slate-700">What matters most when you move? (optional)</label>
+            <input name="matters"
+              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
+              placeholder="Community, culture, walkability..." />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-slate-700">Email</label>
+            <input type="email" name="email" required
+              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
+              placeholder="you@email.com" />
+          </div>
+
+          <button type="submit"
+            class="w-full rounded-full bg-brand-600 text-white font-semibold py-4 hover:bg-brand-700 transition">
+            Submit Lifestyle Check
+          </button>
+
+          <p id="status" class="text-sm text-slate-500 text-center"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 py-12">
+    <div class="max-w-6xl mx-auto px-6 text-sm text-slate-500">
+      <div class="font-medium text-brand-900">CityTwin</div>
+      <div class="mt-2">Helping movers preserve their lifestyle when they relocate.</div>
+      <div class="mt-6 text-xs text-slate-400">© <span id="year"></span> CityTwin</div>
+    </div>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
