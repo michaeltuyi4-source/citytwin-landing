@@ -7,43 +7,23 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   statusEl.textContent = "Submitting...";
 
-  const data = Object.fromEntries(new FormData(form).entries());
+  const data = new FormData(form);
+  data.append("access_key", "893972dd-ad21-49c5-b0dc-90290a8a107a");
 
   try {
-    const res = await fetch("/api/waitlist", {
+    const res = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: data
     });
 
-    if (!res.ok) throw new Error("Request failed");
-    window.location.href = "/thank-you.html";
+    const json = await res.json();
+
+    if (json.success) {
+      window.location.href = "/thank-you.html";
+    } else {
+      statusEl.textContent = "Something went wrong. Please try again.";
+    }
   } catch (err) {
-    statusEl.textContent = "Something went wrong. Please try again.";
-  }
-});
-
-document.getElementById("year").textContent = new Date().getFullYear();
-
-const form = document.getElementById("waitlistForm");
-const statusEl = document.getElementById("status");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  statusEl.textContent = "Submitting...";
-
-  const data = Object.fromEntries(new FormData(form).entries());
-
-  try {
-    const res = await fetch("/api/waitlist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) throw new Error("Request failed");
-    window.location.href = "/thank-you.html";
-  } catch (err) {
-    statusEl.textContent = "Something went wrong. Please try again.";
+    statusEl.textContent = "Network error. Please try again.";
   }
 });
