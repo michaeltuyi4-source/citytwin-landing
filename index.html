@@ -5,98 +5,505 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CityTwin-Preserve your lifestyle when you move</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: "#F4F7FB",
-              100: "#E6EEF7",
-              300: "#9BB8D3",
-              500: "#3B6EA5",
-              600: "#2F5C8F",
-              700: "#244B75",
-              900: "#162F4A"
-            }
-          }
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Reset & Tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-50:  #F2F6FB;
+      --brand-100: #E2EDF7;
+      --brand-200: #C4DAEA;
+      --brand-300: #9BB8D3;
+      --brand-500: #3B6EA5;
+      --brand-600: #2F5C8F;
+      --brand-700: #244B75;
+      --brand-900: #162F4A;
+      --slate-400: #94A3B8;
+      --slate-500: #64748B;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-900: #0F172A;
+      --white: #FFFFFF;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --shadow-card: 0 1px 3px rgba(22,47,74,.07), 0 4px 16px rgba(22,47,74,.06);
+      --shadow-card-hover: 0 4px 24px rgba(22,47,74,.13);
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--slate-900);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    .fade-up { animation: fadeUp .6s ease both; }
+    .fade-up-1 { animation-delay: .05s; }
+    .fade-up-2 { animation-delay: .15s; }
+    .fade-up-3 { animation-delay: .25s; }
+    .fade-up-4 { animation-delay: .35s; }
+
+    /* ── Header ── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(22,47,74,.08);
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--brand-900);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 22px;
+      background: var(--brand-600);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .875rem;
+      border-radius: 100px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .18s, transform .15s, box-shadow .18s;
+      box-shadow: 0 1px 4px rgba(47,92,143,.18);
+    }
+    .btn-primary:hover {
+      background: var(--brand-700);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(47,92,143,.28);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-lg {
+      padding: 15px 34px;
+      font-size: 1rem;
+    }
+    .btn-full { width: 100%; padding: 16px; font-size: 1rem; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: var(--white);
+      padding: 72px 24px 80px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 60% 20%, rgba(59,110,165,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 10% 80%, rgba(155,184,211,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    /* Decorative city grid lines */
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, transparent, rgba(242,246,251,.6));
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 740px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--brand-600);
+      background: var(--brand-50);
+      border: 1px solid var(--brand-200);
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 24px;
+    }
+    .hero-eyebrow span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand-500);
+      animation: float 2.4s ease-in-out infinite;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 7vw, 3.8rem);
+      line-height: 1.12;
+      letter-spacing: -.02em;
+      color: var(--brand-900);
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--brand-600);
+    }
+    .hero-sub {
+      font-size: clamp(.95rem, 2.5vw, 1.1rem);
+      color: var(--slate-600);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .hero-cta { margin-bottom: 36px; }
+    .trust-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 20px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .82rem;
+      color: var(--slate-500);
+      font-weight: 500;
+    }
+    .trust-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand-300);
+      flex-shrink: 0;
+    }
+
+    /* ── Section Shared ── */
+    .section { padding: 80px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-inner--narrow { max-width: 760px; margin: 0 auto; }
+    .section-label {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--brand-500);
+      margin-bottom: 12px;
+    }
+    h2.section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      color: var(--brand-900);
+    }
+    .section-body {
+      font-size: 1.05rem;
+      color: var(--slate-600);
+      line-height: 1.75;
+      margin-top: 16px;
+    }
+
+    /* ── Problem ── */
+    .problem { background: var(--white); }
+    .problem-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      line-height: 1.25;
+      letter-spacing: -.02em;
+      color: var(--brand-900);
+      margin-bottom: 20px;
+    }
+    .problem-quote em {
+      font-style: italic;
+      color: var(--slate-500);
+    }
+
+    /* ── How It Works ── */
+    .how-bg {
+      background: var(--brand-50);
+      border-top: 1px solid rgba(22,47,74,.07);
+      border-bottom: 1px solid rgba(22,47,74,.07);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+    @media (min-width: 640px) {
+      .steps-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    }
+    .step-card {
+      background: var(--white);
+      border: 1px solid rgba(22,47,74,.09);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    .step-card::before {
+      content: attr(data-step);
+      position: absolute;
+      top: -10px;
+      right: 16px;
+      font-family: var(--font-display);
+      font-size: 5rem;
+      color: var(--brand-100);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .step-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--brand-400, #6B9EC4);
+      margin-bottom: 8px;
+    }
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--brand-900);
+      margin-bottom: 8px;
+    }
+    .step-body {
+      font-size: .88rem;
+      color: var(--slate-500);
+      line-height: 1.65;
+    }
+
+    /* ── Lifestyle Fit Cards ── */
+    .lifestyle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 48px;
+    }
+    @media (min-width: 640px) {
+      .lifestyle-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    }
+    .lf-card {
+      background: var(--white);
+      border: 1px solid rgba(22,47,74,.09);
+      border-radius: var(--radius-md);
+      padding: 22px 18px;
+      box-shadow: var(--shadow-card);
+      transition: box-shadow .2s, transform .2s, border-color .2s;
+    }
+    .lf-card:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+      border-color: var(--brand-300);
+    }
+    .lf-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--brand-50);
+      border: 1px solid var(--brand-100);
+      color: var(--brand-700);
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+    .lf-card-title {
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--slate-900);
+      line-height: 1.35;
+    }
+
+    /* ── Form ── */
+    .form-section { background: var(--white); }
+    .form-card {
+      background: var(--white);
+      border: 1px solid rgba(22,47,74,.1);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+      box-shadow: 0 2px 20px rgba(22,47,74,.07), 0 0 0 1px rgba(22,47,74,.03);
+    }
+    @media (max-width: 480px) {
+      .form-card { padding: 28px 20px; border-radius: var(--radius-lg); }
+    }
+    .field-group { margin-bottom: 20px; }
+    .field-label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--slate-700);
+      margin-bottom: 8px;
+    }
+    .field-input {
+      width: 100%;
+      border: 1.5px solid rgba(22,47,74,.15);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      font-family: var(--font-body);
+      font-size: .95rem;
+      color: var(--slate-900);
+      background: var(--white);
+      transition: border-color .18s, box-shadow .18s;
+      outline: none;
+    }
+    .field-input::placeholder { color: var(--slate-400); }
+    .field-input:focus {
+      border-color: var(--brand-400, #6B9EC4);
+      box-shadow: 0 0 0 3px rgba(59,110,165,.1);
+    }
+    #status {
+      text-align: center;
+      font-size: .85rem;
+      color: var(--slate-500);
+      margin-top: 14px;
+      min-height: 20px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid rgba(22,47,74,.08);
+      padding: 48px 24px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--brand-900);
+      margin-bottom: 6px;
+    }
+    .footer-tagline { font-size: .875rem; color: var(--slate-500); }
+    .footer-copy { font-size: .78rem; color: var(--slate-400); margin-top: 28px; }
+
+    /* ── Divider accent ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-divider-line {
+      height: 2px;
+      width: 32px;
+      background: var(--brand-300);
+      border-radius: 2px;
+    }
+
+    /* ── Mobile nav refinements ── */
+    @media (max-width: 400px) {
+      .btn-primary:not(.btn-lg):not(.btn-full) {
+        font-size: .8rem;
+        padding: 9px 16px;
       }
     }
-  </script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    /* Slightly crisper SVG strokes on retina */
-    svg { shape-rendering: geometricPrecision; }
   </style>
 </head>
 
-<body class="bg-white text-slate-900">
+<body>
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="text-xl font-semibold tracking-tight text-brand-900">CityTwin</div>
-      <a href="#lifestyle-check"
-         class="text-sm font-medium px-5 py-2.5 rounded-full bg-brand-600 text-white hover:bg-brand-700 transition">
-        Take the Lifestyle Check
-      </a>
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">CityTwin</a>
+      <a href="#lifestyle-check" class="btn-primary">Take the Lifestyle Check</a>
     </div>
   </header>
 
   <!-- Hero -->
-  <section class="relative bg-gradient-to-br from-white via-brand-50 to-white">
-    <div class="max-w-6xl mx-auto px-6 py-24 text-center">
+  <section class="hero" style="text-align:center;">
+    <div class="hero-inner">
+      <div class="fade-up fade-up-1">
+        <div class="hero-eyebrow" style="display:inline-flex;">
+          <span></span> Early Access
+        </div>
+      </div>
 
-      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-        Moving Soon?<br class="md:hidden">
-        <span class="text-brand-700">Find a Neighborhood That Fits Your Lifestyle.</span>
+      <h1 class="fade-up fade-up-2">
+        Moving soon?<br>
+        Find a neighborhood that<br>
+        <em>fits your life.</em>
       </h1>
 
-      <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-600 leading-relaxed">
-        When you relocate, you shouldn’t lose your routine, your community,
-        or the rhythm of daily life. We’re building a smarter way to help
+      <p class="hero-sub fade-up fade-up-3">
+        When you relocate, you shouldn't lose your routine, your community,
+        or the rhythm of daily life. We're building a smarter way to help
         movers land somewhere that already feels like home.
       </p>
 
-      <div class="mt-10">
-        <a href="#lifestyle-check"
-           class="inline-flex items-center justify-center px-8 py-4 rounded-full bg-brand-600 text-white font-semibold hover:bg-brand-700 transition shadow-sm">
-          Start the Lifestyle Check
-        </a>
+      <div class="hero-cta fade-up fade-up-4">
+        <a href="#lifestyle-check" class="btn-primary btn-lg">Start the Lifestyle Check</a>
       </div>
 
-      <!-- Refined Trust Strip -->
-      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500">
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
-          Takes less than a minute
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
-          No long questionnaires
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-brand-300"></span>
-          Help shape the launch
-        </div>
+      <div class="trust-strip fade-up fade-up-4">
+        <div class="trust-item"><span class="trust-dot"></span> Takes less than a minute</div>
+        <div class="trust-item"><span class="trust-dot"></span> No long questionnaires</div>
+        <div class="trust-item"><span class="trust-dot"></span> Help shape the launch</div>
       </div>
-
     </div>
   </section>
 
-  <!-- Problem Section -->
-  <section class="py-20">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
-        Moving is already overwhelming.
-        <span class="text-slate-600"> Losing your lifestyle makes it worse.</span>
-      </h2>
-      <p class="mt-6 text-lg text-slate-600 leading-relaxed">
-        A new address shouldn’t mean starting your life from scratch.
+  <!-- Problem -->
+  <section class="section problem">
+    <div class="section-inner--narrow" style="text-align:center;">
+      <div class="section-divider" style="justify-content:center;">
+        <div class="section-divider-line"></div>
+        <div class="section-label">The Problem</div>
+        <div class="section-divider-line"></div>
+      </div>
+      <p class="problem-quote">
+        Moving is already overwhelming.<br>
+        <em>Losing your lifestyle makes it worse.</em>
+      </p>
+      <p class="section-body" style="max-width:520px;margin-left:auto;margin-right:auto;">
+        A new address shouldn't mean starting your life from scratch.
         The cafés you love. The markets you trust. The gym you frequent.
         The people who make it feel familiar, those things matter.
       </p>
@@ -104,94 +511,86 @@
   </section>
 
   <!-- How It Works -->
-  <section class="bg-brand-50 py-24 border-y border-slate-200">
-    <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl font-bold text-center tracking-tight text-brand-900">How CityTwin Works</h3>
-
-      <div class="mt-16 grid md:grid-cols-3 gap-10">
-        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-sm uppercase tracking-wide text-slate-500">Step 1</div>
-          <h4 class="mt-2 font-semibold text-lg text-brand-900">Tell us what matters to you</h4>
-          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-            Share a few categories or routines you care about in your next city.
-          </p>
+  <section class="section how-bg">
+    <div class="section-inner">
+      <div style="text-align:center;">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three steps to your matched neighborhood</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card" data-step="1">
+          <div class="step-label">Step 1</div>
+          <div class="step-title">Tell us what matters to you</div>
+          <p class="step-body">Share the routines and categories that are part of your daily life back home.</p>
         </div>
-
-        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-sm uppercase tracking-wide text-slate-500">Step 2</div>
-          <h4 class="mt-2 font-semibold text-lg text-brand-900">Tell us where you're moving</h4>
-          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-            Enter your destination city so we can understand your context.
-          </p>
+        <div class="step-card" data-step="2">
+          <div class="step-label">Step 2</div>
+          <div class="step-title">Tell us where you're moving</div>
+          <p class="step-body">Enter your destination city so we can understand your context and options.</p>
         </div>
-
-        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-sm uppercase tracking-wide text-slate-500">Step 3</div>
-          <h4 class="mt-2 font-semibold text-lg text-brand-900">See how we’d match you</h4>
-          <p class="mt-3 text-slate-600 text-sm leading-relaxed">
-            Preview how lifestyle-fit neighborhood matching will work.
-          </p>
+        <div class="step-card" data-step="3">
+          <div class="step-label">Step 3</div>
+          <div class="step-title">See how we'd match you</div>
+          <p class="step-body">Preview how lifestyle-fit neighborhood matching will work when we launch.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- What Does “Lifestyle Fit” Actually Mean? -->
-  <section class="py-24">
-    <div class="max-w-6xl mx-auto px-6">
-      <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-center text-brand-900">
-        What Does “Lifestyle Fit” Actually Mean?
-      </h3>
+  <!-- Lifestyle Fit -->
+  <section class="section">
+    <div class="section-inner">
+      <div style="text-align:center; margin-bottom:0;">
+        <div class="section-label">What We Look At</div>
+        <h2 class="section-title">What does "Lifestyle Fit" actually mean?</h2>
+        <p class="section-body" style="max-width:520px;margin:12px auto 0;">
+          We map what you rely on in your current city and find neighborhoods in your new one that already have it.
+        </p>
+      </div>
 
-      <div class="mt-14 grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- Daily Routine Access icon (cup + calendar) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
-              <path d="M6 10h8a0 0 0 0 1 0 0v3a4 4 0 0 1-4 4H9a3 3 0 0 1-3-3v-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="lifestyle-grid">
+
+        <!-- Daily Routine -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M6 10h8v3a4 4 0 0 1-4 4H9a3 3 0 0 1-3-3v-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M14 11h1.2A2.8 2.8 0 0 1 18 13.8v.2A3 3 0 0 1 15 17h-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M7 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M18.5 7.5h-4a1 1 0 0 0-1 1v2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16 6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M19 6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">Daily Routine Access</div>
+          <div class="lf-card-title">Daily Routine Access</div>
         </div>
 
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- Community & Culture icon (people + chat) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
+        <!-- Community -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M16.5 21v-1.2a3.8 3.8 0 0 0-3.8-3.8H9.3A3.8 3.8 0 0 0 5.5 19.8V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M11 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M17.5 10.5h3v3l-1.2-1.2H17.5a2 2 0 0 1-2-2v-.8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">Community & Culture</div>
+          <div class="lf-card-title">Community & Culture</div>
         </div>
 
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- International Markets icon (storefront) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
+        <!-- Markets -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M4 9h16l-1.2 9.5A2 2 0 0 1 16.8 20H7.2a2 2 0 0 1-2-1.5L4 9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M6 9l1.2-4.2A2 2 0 0 1 9.1 3.4h5.8a2 2 0 0 1 1.9 1.4L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M8 13h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M9 20v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">International Markets</div>
+          <div class="lf-card-title">International Markets</div>
         </div>
 
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- Fitness & Recreation icon (dumbbell) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
+        <!-- Fitness -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M6 10v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M18 10v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M8.5 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -201,14 +600,13 @@
               <path d="M19 9.5a1 1 0 0 0-1-1h-.5v7h.5a1 1 0 0 0 1-1v-4z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">Fitness & Recreation</div>
+          <div class="lf-card-title">Fitness & Recreation</div>
         </div>
 
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- Faith & Religious Centers icon (simple chapel) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
+        <!-- Faith -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M10.5 5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M5 10l7-4 7 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -216,86 +614,73 @@
               <path d="M11 20v-5a1 1 0 0 1 2 0v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">Faith & Religious Centers</div>
+          <div class="lf-card-title">Faith & Religious Centers</div>
         </div>
 
-        <!-- Card -->
-        <div class="group bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100">
-            <!-- Parks & Atmosphere icon (tree) -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-brand-700">
+        <!-- Parks -->
+        <div class="lf-card">
+          <div class="lf-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12 21v-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M7 21h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M12 15c4 0 7-2.6 7-6.2C19 5.7 16.7 3 12 3S5 5.7 5 8.8C5 12.4 8 15 12 15z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9.5 10.5c.9-1.2 2-2 2.5-2.2.6.2 1.8 1 2.5 2.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="mt-4 font-semibold text-slate-900">Parks & Atmosphere</div>
+          <div class="lf-card-title">Parks & Atmosphere</div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Form Section -->
-  <section id="lifestyle-check" class="py-24">
-    <div class="max-w-3xl mx-auto px-6 text-center">
-      <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-brand-900">
-        Help us understand what matters when you move
-      </h3>
-      <p class="mt-4 text-slate-600 leading-relaxed">
-        We’re launching in select cities. Tell us what matters most to you
-        and we’ll notify you when early access opens.
+  <!-- Form -->
+  <section id="lifestyle-check" class="section form-section" style="background:var(--brand-50); border-top:1px solid rgba(22,47,74,.07);">
+    <div class="section-inner--narrow" style="text-align:center;">
+      <div class="section-label">Early Access</div>
+      <h2 class="section-title">Help us understand what matters when you move</h2>
+      <p class="section-body" style="max-width:460px;margin:10px auto 40px;">
+        We're launching in select cities. Tell us what matters most and we'll notify you when early access opens.
       </p>
 
-      <div class="mt-12 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm text-left">
-        <form id="waitlistForm" class="space-y-6">
-
-          <div>
-            <label class="text-sm font-medium text-slate-700">What city are you moving to?</label>
-            <input name="city" required
-              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
-              placeholder="Dallas, Atlanta, Charlotte..." />
+      <div class="form-card" style="text-align:left;">
+        <form id="waitlistForm">
+          <div class="field-group">
+            <label class="field-label" for="city">What city are you moving to?</label>
+            <input id="city" name="city" required class="field-input"
+              placeholder="Dallas, Atlanta, Charlotte…" />
           </div>
 
-          <div>
-            <label class="text-sm font-medium text-slate-700">What matters most when you move? (optional)</label>
-            <input name="matters"
-              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
-              placeholder="Community, culture, walkability..." />
+          <div class="field-group">
+            <label class="field-label" for="matters">What matters most when you move? <span style="font-weight:400;color:var(--slate-400);">(optional)</span></label>
+            <input id="matters" name="matters" class="field-input"
+              placeholder="Community, culture, walkability…" />
           </div>
 
-          <div>
-            <label class="text-sm font-medium text-slate-700">Email</label>
-            <input type="email" name="email" required
-              class="mt-2 w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-300"
+          <div class="field-group" style="margin-bottom:24px;">
+            <label class="field-label" for="email">Email</label>
+            <input id="email" type="email" name="email" required class="field-input"
               placeholder="you@email.com" />
           </div>
 
-          <button type="submit"
-            class="w-full rounded-full bg-brand-600 text-white font-semibold py-4 hover:bg-brand-700 transition">
-            Submit Lifestyle Check
-          </button>
-
-          <p id="status" class="text-sm text-slate-500 text-center"></p>
+          <button type="submit" class="btn-primary btn-full">Submit Lifestyle Check</button>
+          <p id="status"></p>
         </form>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 py-12">
-    <div class="max-w-6xl mx-auto px-6 text-sm text-slate-500">
-      <div class="font-medium text-brand-900">CityTwin</div>
-      <div class="mt-2">Helping movers preserve their lifestyle when they relocate.</div>
-      <div class="mt-6 text-xs text-slate-400">© <span id="year"></span> CityTwin</div>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">CityTwin</div>
+      <p class="footer-tagline">Helping movers preserve their lifestyle when they relocate.</p>
+      <p class="footer-copy">© <span id="year"></span> CityTwin</p>
     </div>
   </footer>
 
   <script>
-    // Keep year current (works even if script.js is removed later)
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
-
   <script src="./script.js"></script>
 </body>
 </html>
