@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Neighborhood Matches — CityTwin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#162F4A;
+  --navy-mid:#244B75;
+  --navy-soft:#2F5C8F;
+  --blue-pale:#E8EFF6;
+  --blue-mist:#F0F4F8;
+  --slate:#64748B;
+  --slate-light:#94A3B8;
+  --white:#FFFFFF;
+  --bg:#F7F9FB;
+  --amber:#C47B2B;
+  --amber-bg:#FDF5EA;
+  --green:#2A7A5A;
+  --green-bg:#EAF5EF;
+  --red:#B91C1C;
+  --red-bg:#FEF2F2;
+  --font-display:'DM Serif Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --radius-pill:100px;
+  --shadow-soft:0 2px 16px rgba(22,47,74,.07);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--navy);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--font-display);font-size:1.25rem;color:var(--navy);text-decoration:none}
+.nav-back{font-size:.82rem;color:var(--slate);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--navy)}
+
+/* Hero — white, not dark */
+.hero{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:40px 24px 36px;text-align:center}
+.hero-eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:12px}
+.hero-title{font-family:var(--font-display);font-size:1.9rem;color:var(--navy);line-height:1.2;margin-bottom:10px}
+.hero-title em{font-style:italic;color:var(--navy-soft)}
+.hero-sub{font-size:.9rem;color:var(--slate);max-width:440px;margin:0 auto;line-height:1.65}
+
+/* Page */
+.page{max-width:600px;margin:0 auto;padding:32px 20px 80px}
+
+/* Match cards */
+.match-card{background:var(--white);border:1px solid var(--blue-pale);border-radius:20px;box-shadow:var(--shadow-soft);margin-bottom:20px;overflow:hidden;animation:fadeUp .4s ease both}
+.match-card:nth-child(1){animation-delay:.04s}
+.match-card:nth-child(2){animation-delay:.1s}
+.match-card:nth-child(3){animation-delay:.16s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* rank accent line */
+.match-card.rank-1{border-top:3px solid var(--amber)}
+.match-card.rank-2{border-top:3px solid var(--navy-soft)}
+.match-card.rank-3{border-top:3px solid var(--blue-pale)}
+
+.card-header{padding:22px 22px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+
+.card-rank{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:5px}
+.match-card.rank-1 .card-rank{color:var(--amber)}
+.card-name{font-family:var(--font-display);font-size:1.4rem;color:var(--navy);margin-bottom:3px;line-height:1.2}
+.card-tagline{font-size:.8rem;color:var(--slate)}
+
+/* score badge */
+.score-badge{flex-shrink:0;width:64px;height:64px;border-radius:50%;border:2px solid var(--blue-pale);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg)}
+.match-card.rank-1 .score-badge{border-color:var(--amber);background:var(--amber-bg)}
+.score-num{font-family:var(--font-display);font-size:1.3rem;line-height:1;color:var(--navy)}
+.match-card.rank-1 .score-num{color:var(--amber)}
+.score-lbl{font-size:.6rem;color:var(--slate-light);font-weight:500;margin-top:1px}
+
+/* card body */
+.card-body{padding:0 22px 22px}
+
+/* why box — warm highlight */
+.why-box{background:var(--blue-mist);border-left:3px solid var(--navy-soft);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:20px;font-size:.86rem;color:var(--navy-mid);line-height:1.6}
+.match-card.rank-1 .why-box{background:var(--amber-bg);border-left-color:var(--amber);color:#7A4A10}
+
+/* info rows */
+.info-row{display:flex;gap:0;border-top:1px solid var(--blue-pale);padding-top:16px;margin-bottom:16px;flex-wrap:wrap;gap:16px}
+.info-block{flex:1;min-width:120px}
+.info-label{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-light);margin-bottom:4px}
+.info-value{font-size:.86rem;color:var(--navy);font-weight:500}
+
+/* highlights */
+.highlights{margin-bottom:16px}
+.highlights-label{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-light);margin-bottom:8px}
+.highlights-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.highlights-list li{font-size:.82rem;color:var(--slate);padding-left:16px;position:relative;line-height:1.5}
+.highlights-list li::before{content:'→';position:absolute;left:0;color:var(--green);font-size:.68rem;top:3px}
+
+/* best for tags */
+.tags-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tag{font-size:.72rem;font-weight:500;color:var(--navy-mid);background:var(--blue-mist);border-radius:var(--radius-pill);padding:4px 12px;border:1px solid var(--blue-pale)}
+
+/* gaps */
+.gaps-section{margin-bottom:4px}
+.gaps-label{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-light);margin-bottom:8px}
+.gap-item{display:flex;align-items:flex-start;gap:8px;background:var(--red-bg);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:.8rem;color:var(--red);line-height:1.5}
+.gap-item.must{border:1px solid #FECACA;font-weight:500}
+.gap-icon{flex-shrink:0;font-size:.85rem}
+
+/* score breakdown */
+.breakdown-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;background:none;border:none;border-top:1px solid var(--blue-pale);padding:14px 22px;font-family:var(--font-body);font-size:.8rem;color:var(--navy-soft);cursor:pointer;transition:color .2s}
+.breakdown-toggle:hover{color:var(--navy)}
+.toggle-arrow{transition:transform .2s;display:inline-block;font-size:.7rem}
+.breakdown-toggle.open .toggle-arrow{transform:rotate(180deg)}
+.breakdown-body{display:none;padding:16px 22px 20px;border-top:1px solid var(--blue-pale)}
+.breakdown-body.open{display:block}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-lbl{font-size:.74rem;color:var(--slate);width:110px;flex-shrink:0}
+.bar-track{flex:1;height:5px;background:var(--blue-pale);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.bar-score{font-size:.7rem;font-weight:600;color:var(--navy-mid);width:30px;text-align:right;flex-shrink:0}
+
+/* bottom */
+.bottom{text-align:center;padding-top:8px}
+.bottom p{font-size:.86rem;color:var(--slate);margin-bottom:20px;line-height:1.6}
+.bottom-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:15px 28px;font-family:var(--font-body);font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s}
+.btn-primary:hover{background:var(--navy-mid)}
+.btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--blue-pale);border-radius:var(--radius-pill);padding:15px 24px;font-family:var(--font-body);font-size:.9rem;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s}
+.btn-ghost:hover{border-color:var(--navy-mid);color:var(--navy)}
+
+.no-results{text-align:center;padding:60px 24px}
+.no-results h2{font-family:var(--font-display);font-size:1.6rem;margin-bottom:12px}
+.no-results p{color:var(--slate);margin-bottom:24px}
+
+@media(max-width:400px){
+  .card-header{flex-direction:column}
+  .score-badge{align-self:flex-start}
+  .hero-title{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">CityTwin</a>
+  <a href="find.html" class="nav-back">← Start over</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Your results</div>
+  <h1 class="hero-title" id="hero-title">Your top <em>neighborhood matches</em></h1>
+  <p class="hero-sub">Based on what you told us matters, here are the neighborhoods most likely to feel like home.</p>
+</div>
+
+<div class="page" id="results-page"></div>
+
+<script type="module">
+import { LIFESTYLE_CATEGORIES } from './data/neighborhoods.js';
+
+const CAT_META = {
+  walkability:{label:'Walkability',icon:'🚶'},
+  transitAccess:{label:'Public transit',icon:'🚇'},
+  foodScene:{label:'Food scene',icon:'🍜'},
+  coffeeShops:{label:'Coffee shops',icon:'☕'},
+  outdoorSpaces:{label:'Outdoor spaces',icon:'🌳'},
+  nightlife:{label:'Nightlife',icon:'🎵'},
+  familyFriendly:{label:'Family-friendly',icon:'👨‍👩‍👧'},
+  culturalDiversity:{label:'Cultural diversity',icon:'🌍'},
+  affordability:{label:'Affordability',icon:'💰'},
+  quietResidential:{label:'Quiet & residential',icon:'🏡'},
+};
+
+const raw        = sessionStorage.getItem('citytwin_results');
+const rawPri     = sessionStorage.getItem('citytwin_priorities');
+const results    = raw    ? JSON.parse(raw)    : [];
+const priorities = rawPri ? JSON.parse(rawPri) : {};
+const page       = document.getElementById('results-page');
+
+if (!results.length) {
+  page.innerHTML = `<div class="no-results"><h2>No results found</h2><p>Something went wrong. Let's try again.</p><a href="find.html" class="btn-primary">Start over</a></div>`;
+} else {
+  document.getElementById('hero-title').innerHTML =
+    `Your top <em>neighborhoods in ${results[0]?.cityName || ''}</em>`;
+
+  const userCats = Object.keys(priorities);
+
+  results.forEach((r, i) => {
+    const rank      = i + 1;
+    const rankLabel = rank === 1 ? '🏆 Best match' : `#${rank} match`;
+
+    const bars = userCats.map(cat => {
+      const m     = CAT_META[cat] || { label: cat, icon: '' };
+      const score = r.scores[cat] ?? 0;
+      const color = score >= 8 ? '#2A7A5A' : score >= 6 ? '#2F5C8F' : '#94A3B8';
+      return `<div class="bar-row">
+        <span class="bar-lbl">${m.icon} ${m.label}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${score*10}%;background:${color}"></div></div>
+        <span class="bar-score">${score}/10</span>
+      </div>`;
+    }).join('');
+
+    const highlights = (r.highlights || []).slice(0, 3)
+      .map(h => `<li>${h}</li>`).join('');
+
+    const tags = (r.bestFor || [])
+      .map(b => `<span class="tag">${b}</span>`).join('');
+
+    const gaps = (r.gaps || []).map(g => {
+      const must = g.includes('must-have');
+      return `<div class="gap-item ${must ? 'must' : ''}">
+        <span class="gap-icon">${must ? '⚠️' : '•'}</span>
+        <span>${g}</span>
+      </div>`;
+    }).join('');
+
+    const card = document.createElement('div');
+    card.className = `match-card rank-${rank}`;
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <div class="card-rank">${rankLabel}</div>
+          <div class="card-name">${r.name}</div>
+          <div class="card-tagline">${r.tagline}</div>
+        </div>
+        <div class="score-badge">
+          <div class="score-num">${r.matchPercent}%</div>
+          <div class="score-lbl">match</div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="why-box">${r.explanation}</div>
+
+        <div class="info-row">
+          <div class="info-block">
+            <div class="info-label">Rent range</div>
+            <div class="info-value">${r.rentRange}</div>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Walk Score</div>
+            <div class="info-value">${r.walkScore} / 100</div>
+          </div>
+        </div>
+
+        ${highlights ? `<div class="highlights">
+          <div class="highlights-label">What makes it stand out</div>
+          <ul class="highlights-list">${highlights}</ul>
+        </div>` : ''}
+
+        ${tags ? `<div class="tags-row">${tags}</div>` : ''}
+
+        ${gaps ? `<div class="gaps-section">
+          <div class="gaps-label">Things to know</div>
+          ${gaps}
+        </div>` : ''}
+      </div>
+
+      <button class="breakdown-toggle" onclick="toggleBreakdown(this)">
+        <span>See full score breakdown</span>
+        <span class="toggle-arrow">▾</span>
+      </button>
+      <div class="breakdown-body">
+        ${bars}
+      </div>`;
+
+    page.appendChild(card);
+  });
+
+  const bottom = document.createElement('div');
+  bottom.className = 'bottom';
+  bottom.innerHTML = `
+    <p>Not quite right? Adjust your priorities and run it again.</p>
+    <div class="bottom-btns">
+      <a href="find.html" class="btn-ghost">← Change my priorities</a>
+      <a href="index.html" class="btn-primary">Back to home</a>
+    </div>`;
+  page.appendChild(bottom);
+}
+
+window.toggleBreakdown = function(btn) {
+  btn.classList.toggle('open');
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+  btn.querySelector('span:first-child').textContent =
+    body.classList.contains('open') ? 'Hide score breakdown' : 'See full score breakdown';
+};
+</script>
+</body>
+</html>

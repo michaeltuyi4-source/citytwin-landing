@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Find Your Neighborhood — CityTwin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#162F4A;
+  --navy-mid:#244B75;
+  --navy-soft:#2F5C8F;
+  --blue-pale:#E8EFF6;
+  --blue-mist:#F0F4F8;
+  --slate:#64748B;
+  --slate-light:#94A3B8;
+  --white:#FFFFFF;
+  --bg:#F7F9FB;
+  --amber:#C47B2B;
+  --green:#2A7A5A;
+  --font-display:'DM Serif Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --radius-pill:100px;
+  --shadow-soft:0 2px 16px rgba(22,47,74,.07);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--navy);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:var(--font-display);font-size:1.25rem;color:var(--navy);text-decoration:none}
+.nav-back{font-size:.82rem;color:var(--slate);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--navy)}
+
+.progress-wrap{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14px 24px}
+.progress-steps{display:flex;align-items:center;max-width:460px;margin:0 auto}
+.progress-step{display:flex;align-items:center;gap:8px;flex:1}
+.progress-step::after{content:'';flex:1;height:1px;background:var(--blue-pale);margin:0 8px}
+.progress-step:last-child::after{display:none}
+.step-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:var(--slate-light);flex-shrink:0;transition:all .3s;background:var(--white)}
+.step-dot.active{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.step-dot.done{background:var(--green);border-color:var(--green);color:var(--white)}
+.step-label{font-size:.72rem;color:var(--slate-light);white-space:nowrap}
+.progress-step.active .step-label{color:var(--navy);font-weight:500}
+.progress-step.done .step-label{color:var(--green)}
+
+.page{max-width:580px;margin:0 auto;padding:40px 20px 80px}
+
+.step-panel{display:none}
+.step-panel.active{display:block;animation:fadeUp .3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.step-eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:10px}
+.step-heading{font-family:var(--font-display);font-size:1.85rem;color:var(--navy);line-height:1.2;margin-bottom:8px}
+.step-heading em{font-style:italic;color:var(--navy-soft)}
+.step-sub{font-size:.9rem;color:var(--slate);line-height:1.65;margin-bottom:32px}
+
+/* City cards */
+.city-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.city-card{background:var(--white);border:1.5px solid var(--blue-pale);border-radius:18px;padding:20px 22px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:var(--shadow-soft);display:flex;align-items:center;justify-content:space-between;gap:16px;user-select:none;-webkit-tap-highlight-color:transparent}
+.city-card:hover{border-color:var(--navy-mid);box-shadow:0 4px 20px rgba(22,47,74,.1)}
+.city-card.selected{border-color:var(--navy);background:var(--blue-mist)}
+.city-name{font-weight:600;font-size:.98rem;color:var(--navy);margin-bottom:2px}
+.city-state{font-size:.75rem;color:var(--slate);margin-bottom:5px}
+.city-note{font-size:.74rem;color:var(--slate-light);line-height:1.5}
+.city-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--blue-pale);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:transparent;background:var(--white);transition:all .2s}
+.city-card.selected .city-check{background:var(--navy);border-color:var(--navy);color:var(--white)}
+
+/* Category cards */
+.sel-hint{font-size:.82rem;color:var(--slate);margin-bottom:16px}
+.sel-hint strong{color:var(--navy)}
+.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px}
+.category-card{background:var(--white);border:1.5px solid var(--blue-pale);border-radius:16px;padding:16px 14px;cursor:pointer;transition:border-color .2s,background .2s;box-shadow:var(--shadow-soft);user-select:none;-webkit-tap-highlight-color:transparent}
+.category-card:active{transform:scale(.98)}
+.category-card.selected{border-color:var(--navy);background:var(--blue-mist)}
+.cat-icon{font-size:1.35rem;margin-bottom:8px;display:block}
+.cat-label{font-weight:600;font-size:.84rem;color:var(--navy);margin-bottom:2px}
+.cat-desc{font-size:.71rem;color:var(--slate-light);line-height:1.4}
+
+/* Priority rows */
+.priority-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.priority-row{background:var(--white);border:1px solid var(--blue-pale);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-soft)}
+.priority-name{font-weight:500;font-size:.88rem;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.priority-options{display:flex;gap:7px}
+.priority-btn{flex:1;padding:9px 6px;border-radius:var(--radius-pill);border:1.5px solid var(--blue-pale);background:var(--bg);font-family:var(--font-body);font-size:.74rem;font-weight:500;color:var(--slate);cursor:pointer;transition:all .18s;text-align:center;-webkit-tap-highlight-color:transparent}
+.priority-btn:hover{border-color:var(--navy-mid);color:var(--navy)}
+.priority-btn.must{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.priority-btn.important{background:var(--blue-mist);border-color:var(--navy-mid);color:var(--navy-mid)}
+.priority-btn.nice{background:var(--bg);border-color:var(--blue-pale);color:var(--slate)}
+
+/* Buttons */
+.btn-row{display:flex;gap:10px;align-items:center}
+.btn-primary{background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:16px 32px;font-family:var(--font-body);font-size:.92rem;font-weight:600;cursor:pointer;transition:background .2s,transform .15s;flex:1;text-align:center}
+.btn-primary:hover{background:var(--navy-mid)}
+.btn-primary:active{transform:scale(.98)}
+.btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--blue-pale);border-radius:var(--radius-pill);padding:16px 22px;font-family:var(--font-body);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-ghost:hover{border-color:var(--navy-mid);color:var(--navy)}
+
+.val-msg{font-size:.8rem;color:#B91C1C;margin-top:10px;display:none;padding:10px 14px;background:#FEF2F2;border-radius:10px;line-height:1.5}
+.val-msg.show{display:block}
+
+@media(max-width:360px){
+  .category-grid{grid-template-columns:1fr}
+  .step-heading{font-size:1.5rem}
+  .priority-options{flex-direction:column}
+  .priority-btn{flex:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">CityTwin</a>
+  <a href="index.html" class="nav-back">← Home</a>
+</nav>
+
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="progress-step active" id="prog-1">
+      <div class="step-dot active" id="dot-1">1</div>
+      <span class="step-label">City</span>
+    </div>
+    <div class="progress-step" id="prog-2">
+      <div class="step-dot" id="dot-2">2</div>
+      <span class="step-label">Lifestyle</span>
+    </div>
+    <div class="progress-step" id="prog-3">
+      <div class="step-dot" id="dot-3">3</div>
+      <span class="step-label">Priorities</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- STEP 1 -->
+  <div class="step-panel active" id="step-1">
+    <div class="step-eyebrow">Step 1 of 3</div>
+    <h1 class="step-heading">Where are you<br><em>moving to?</em></h1>
+    <p class="step-sub">Pick your destination city. We'll match you to the neighborhoods most likely to feel like home.</p>
+    <div class="city-grid">
+      <div class="city-card" data-city="charlotte" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Charlotte, NC</div>
+          <div class="city-state">North Carolina</div>
+          <div class="city-note">Fast-growing Sun Belt city with walkable pockets near the light rail</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="montgomery" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Montgomery County, MD</div>
+          <div class="city-state">Maryland</div>
+          <div class="city-note">DC suburb corridor — Rockville, Kentlands &amp; Germantown</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="chicago" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Chicago, IL</div>
+          <div class="city-state">Illinois</div>
+          <div class="city-note">World-class walkability, food, and distinct neighborhood character</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+    </div>
+    <div class="val-msg" id="val-1">Please select a city to continue.</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="step-2">
+    <div class="step-eyebrow">Step 2 of 3</div>
+    <h1 class="step-heading">What shapes your<br><em>daily life?</em></h1>
+    <p class="step-sub">Select everything that matters to you in a neighborhood. Pick at least 3 — more gives better results.</p>
+    <p class="sel-hint">Selected: <strong id="sel-count">0</strong> of 10</p>
+    <div class="category-grid">
+      <div class="category-card" data-cat="walkability" onclick="toggleCat(this)">
+        <span class="cat-icon">🚶</span>
+        <div class="cat-label">Walkability</div>
+        <div class="cat-desc">Get errands done on foot</div>
+      </div>
+      <div class="category-card" data-cat="transitAccess" onclick="toggleCat(this)">
+        <span class="cat-icon">🚇</span>
+        <div class="cat-label">Public transit</div>
+        <div class="cat-desc">Buses, trains, light rail</div>
+      </div>
+      <div class="category-card" data-cat="foodScene" onclick="toggleCat(this)">
+        <span class="cat-icon">🍜</span>
+        <div class="cat-label">Food scene</div>
+        <div class="cat-desc">Restaurants, variety, quality</div>
+      </div>
+      <div class="category-card" data-cat="coffeeShops" onclick="toggleCat(this)">
+        <span class="cat-icon">☕</span>
+        <div class="cat-label">Coffee shops</div>
+        <div class="cat-desc">Cafes to work or meet</div>
+      </div>
+      <div class="category-card" data-cat="outdoorSpaces" onclick="toggleCat(this)">
+        <span class="cat-icon">🌳</span>
+        <div class="cat-label">Outdoor spaces</div>
+        <div class="cat-desc">Parks, trails, green space</div>
+      </div>
+      <div class="category-card" data-cat="nightlife" onclick="toggleCat(this)">
+        <span class="cat-icon">🎵</span>
+        <div class="cat-label">Nightlife</div>
+        <div class="cat-desc">Bars, music, evening energy</div>
+      </div>
+      <div class="category-card" data-cat="familyFriendly" onclick="toggleCat(this)">
+        <span class="cat-icon">👨‍👩‍👧</span>
+        <div class="cat-label">Family-friendly</div>
+        <div class="cat-desc">Schools, safety, community</div>
+      </div>
+      <div class="category-card" data-cat="culturalDiversity" onclick="toggleCat(this)">
+        <span class="cat-icon">🌍</span>
+        <div class="cat-label">Cultural diversity</div>
+        <div class="cat-desc">International food &amp; community</div>
+      </div>
+      <div class="category-card" data-cat="affordability" onclick="toggleCat(this)">
+        <span class="cat-icon">💰</span>
+        <div class="cat-label">Affordability</div>
+        <div class="cat-desc">Lower rent relative to city</div>
+      </div>
+      <div class="category-card" data-cat="quietResidential" onclick="toggleCat(this)">
+        <span class="cat-icon">🏡</span>
+        <div class="cat-label">Quiet &amp; residential</div>
+        <div class="cat-desc">Calm streets, less noise</div>
+      </div>
+    </div>
+    <div class="val-msg" id="val-2">Please select at least 3 things that matter to you.</div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary" onclick="goToStep(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-panel" id="step-3">
+    <div class="step-eyebrow">Step 3 of 3</div>
+    <h1 class="step-heading">How much does<br><em>each one matter?</em></h1>
+    <p class="step-sub">Be honest — this is what makes your match accurate. A "must have" carries three times the weight of "nice to have."</p>
+    <div class="priority-list" id="priority-list"></div>
+    <div class="val-msg" id="val-3">Please set a priority level for every item before continuing.</div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(2)">← Back</button>
+      <button class="btn-primary" onclick="submitAndFind()">Find my neighborhoods →</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { LIFESTYLE_CATEGORIES, PRIORITY_WEIGHTS } from './data/neighborhoods.js';
+import { getTopMatches } from './data/scoring.js';
+
+let selectedCity = null;
+let selectedCats = new Set();
+let priorities   = {};
+let currentStep  = 1;
+
+const ICONS = { walkability:'🚶',transitAccess:'🚇',foodScene:'🍜',coffeeShops:'☕',outdoorSpaces:'🌳',nightlife:'🎵',familyFriendly:'👨‍👩‍👧',culturalDiversity:'🌍',affordability:'💰',quietResidential:'🏡' };
+
+window.selectCity = function(card) {
+  document.querySelectorAll('.city-card').forEach(c => {
+    c.classList.remove('selected');
+  });
+  card.classList.add('selected');
+  selectedCity = card.dataset.city;
+  hide('val-1');
+};
+
+window.toggleCat = function(card) {
+  const cat = card.dataset.cat;
+  if (selectedCats.has(cat)) {
+    selectedCats.delete(cat);
+    card.classList.remove('selected');
+    delete priorities[cat];
+  } else {
+    selectedCats.add(cat);
+    card.classList.add('selected');
+  }
+  document.getElementById('sel-count').textContent = selectedCats.size;
+  hide('val-2');
+};
+
+window.goToStep = function(n) {
+  if (n > currentStep) {
+    if (currentStep === 1 && !selectedCity)         { show('val-1'); return; }
+    if (currentStep === 2 && selectedCats.size < 3) { show('val-2'); return; }
+    if (currentStep === 2 && n === 3) buildPriorityList();
+  }
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`step-${n}`).classList.add('active');
+  updateProgress(n);
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+function buildPriorityList() {
+  const list = document.getElementById('priority-list');
+  list.innerHTML = '';
+  selectedCats.forEach(cat => {
+    const def   = LIFESTYLE_CATEGORIES.find(c => c.id === cat);
+    const label = def ? def.label : cat;
+    const icon  = ICONS[cat] || '•';
+    const row   = document.createElement('div');
+    row.className = 'priority-row';
+    row.innerHTML = `
+      <div class="priority-name"><span>${icon}</span> ${label}</div>
+      <div class="priority-options">
+        <button class="priority-btn" data-cat="${cat}" data-val="must-have"    onclick="setPriority(this)">Must have</button>
+        <button class="priority-btn" data-cat="${cat}" data-val="important"    onclick="setPriority(this)">Important</button>
+        <button class="priority-btn" data-cat="${cat}" data-val="nice-to-have" onclick="setPriority(this)">Nice to have</button>
+      </div>`;
+    list.appendChild(row);
+    if (priorities[cat]) {
+      const btn = row.querySelector(`[data-val="${priorities[cat]}"]`);
+      if (btn) applyStyle(btn);
+    }
+  });
+  window.setPriority = setPriority;
+}
+
+function setPriority(btn) {
+  const cat = btn.dataset.cat;
+  btn.closest('.priority-options').querySelectorAll('.priority-btn').forEach(b => b.classList.remove('must','important','nice'));
+  applyStyle(btn);
+  priorities[cat] = btn.dataset.val;
+  hide('val-3');
+}
+
+function applyStyle(btn) {
+  const map = { 'must-have':'must','important':'important','nice-to-have':'nice' };
+  btn.classList.add(map[btn.dataset.val]);
+}
+
+function updateProgress(n) {
+  for (let i = 1; i <= 3; i++) {
+    const dot  = document.getElementById(`dot-${i}`);
+    const prog = document.getElementById(`prog-${i}`);
+    dot.classList.remove('active','done');
+    prog.classList.remove('active','done');
+    if (i < n)        { dot.classList.add('done');   prog.classList.add('done');   dot.textContent = '✓'; }
+    else if (i === n) { dot.classList.add('active');  prog.classList.add('active'); dot.textContent = i; }
+    else              { dot.textContent = i; }
+  }
+}
+
+window.submitAndFind = function() {
+  const unset = [...selectedCats].filter(c => !priorities[c]);
+  if (unset.length > 0) { show('val-3'); return; }
+  const results = getTopMatches(selectedCity, priorities, LIFESTYLE_CATEGORIES);
+  sessionStorage.setItem('citytwin_results',    JSON.stringify(results));
+  sessionStorage.setItem('citytwin_city',       selectedCity);
+  sessionStorage.setItem('citytwin_priorities', JSON.stringify(priorities));
+  window.location.href = 'results.html';
+};
+
+function show(id) { document.getElementById(id).classList.add('show'); }
+function hide(id) { document.getElementById(id).classList.remove('show'); }
+</script>
+</body>
+</html>

@@ -479,7 +479,7 @@
       </p>
 
       <div class="hero-cta fade-up fade-up-4">
-        <a href="#lifestyle-check" class="btn-primary btn-lg">Start the Lifestyle Check</a>
+        <a href="find.html" class="btn-primary btn-lg">Start the Lifestyle Check</a>
       </div>
 
       <div class="trust-strip fade-up fade-up-4">
@@ -633,41 +633,30 @@
     </div>
   </section>
 
-  <!-- Form -->
-  <section id="lifestyle-check" class="section form-section" style="background:var(--brand-50); border-top:1px solid rgba(22,47,74,.07);">
-    <div class="section-inner--narrow" style="text-align:center;">
-      <div class="section-label">Early Access</div>
-      <h2 class="section-title">Help us understand what matters when you move</h2>
-      <p class="section-body" style="max-width:460px;margin:10px auto 40px;">
-        We're launching in select cities. Tell us what matters most and we'll notify you when early access opens.
-      </p>
-
-      <div class="form-card" style="text-align:left;">
-        <form id="waitlistForm">
-          <div class="field-group">
-            <label class="field-label" for="city">What city are you moving to?</label>
-            <input id="city" name="city" required class="field-input"
-              placeholder="Dallas, Atlanta, Charlotte…" />
-          </div>
-
-          <div class="field-group">
-            <label class="field-label" for="matters">What matters most when you move? <span style="font-weight:400;color:var(--slate-400);">(optional)</span></label>
-            <input id="matters" name="matters" class="field-input"
-              placeholder="Community, culture, walkability…" />
-          </div>
-
-          <div class="field-group" style="margin-bottom:24px;">
-            <label class="field-label" for="email">Email</label>
-            <input id="email" type="email" name="email" required class="field-input"
-              placeholder="you@email.com" />
-          </div>
-
-          <button type="submit" class="btn-primary btn-full">Submit Lifestyle Check</button>
-          <p id="status"></p>
-        </form>
-      </div>
+<!-- Form -->
+<section id="lifestyle-check" class="section form-section" style="background:var(--brand-50); border-top:1px solid rgba(22,47,74,.07);">
+  <div class="section-inner--narrow" style="text-align:center;">
+    <div class="section-label">Early Access</div>
+    <h2 class="section-title">Not ready yet?<br><em>Join the waitlist.</em></h2>
+    <p class="section-body" style="max-width:420px;margin:10px auto 40px;">
+      We're launching in select cities. Leave your email and we'll notify you the moment your city goes live.
+    </p>
+    <div class="form-card" style="text-align:left;">
+      <form id="waitlistForm">
+        <div class="field-group" style="margin-bottom:24px;">
+          <label class="field-label" for="email">Email address</label>
+          <input id="email" type="email" name="email" required class="field-input"
+            placeholder="you@email.com" />
+        </div>
+        <button type="submit" class="btn-primary btn-full">Notify me when it's live</button>
+        <p id="status"></p>
+      </form>
     </div>
-  </section>
+    <p style="margin-top:20px;font-size:.82rem;color:var(--slate-400);">
+      Ready to try it now? <a href="find.html" style="color:var(--brand-600);font-weight:500;text-decoration:none;">Start the Lifestyle Check →</a>
+    </p>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer class="footer">
