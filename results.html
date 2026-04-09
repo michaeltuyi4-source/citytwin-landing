@@ -148,7 +148,7 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18p
 <div class="hero">
   <div class="hero-eyebrow">Your results</div>
   <h1 class="hero-title" id="hero-title">Your top <em>neighborhood matches</em></h1>
-  <p class="hero-sub">Based on what you told us matters, here are the neighborhoods most likely to feel like home.</p>
+  <p class="hero-sub">Based on what you told us matters, here are the neighborhoods most likely to feel like home. Your match score is personal — it reflects how well each neighborhood fits <em>your</em> priorities, not a general quality ranking.</p>
 </div>
 
 <div class="page" id="results-page"></div>
@@ -268,7 +268,7 @@ if (!results.length) {
   const bottom = document.createElement('div');
   bottom.className = 'bottom';
   bottom.innerHTML = `
-    <p>Not quite right? Adjust your priorities and run it again.</p>
+    <p>Not quite right? Adjust your priorities and run it again — a different weighting will produce a different ranking.</p>
     <div class="bottom-btns">
       <a href="find.html" class="btn-ghost">← Change my priorities</a>
       <a href="index.html" class="btn-primary">Back to home</a>

@@ -57,7 +57,8 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18p
 .step-sub{font-size:.9rem;color:var(--slate);line-height:1.65;margin-bottom:32px}
 
 /* City cards */
-.city-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.city-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px}
+@media(max-width:480px){.city-grid{grid-template-columns:1fr}}
 .city-card{background:var(--white);border:1.5px solid var(--blue-pale);border-radius:18px;padding:20px 22px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:var(--shadow-soft);display:flex;align-items:center;justify-content:space-between;gap:16px;user-select:none;-webkit-tap-highlight-color:transparent}
 .city-card:hover{border-color:var(--navy-mid);box-shadow:0 4px 20px rgba(22,47,74,.1)}
 .city-card.selected{border-color:var(--navy);background:var(--blue-mist)}
@@ -87,7 +88,7 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18p
 .priority-btn:hover{border-color:var(--navy-mid);color:var(--navy)}
 .priority-btn.must{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .priority-btn.important{background:var(--blue-mist);border-color:var(--navy-mid);color:var(--navy-mid)}
-.priority-btn.nice{background:var(--blue-pale);border-color:var(--slate-light);color:var(--slate)}
+.priority-btn.nice{background:var(--bg);border-color:var(--blue-pale);color:var(--slate)}
 
 /* Buttons */
 .btn-row{display:flex;gap:10px;align-items:center}
@@ -161,6 +162,46 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:18p
           <div class="city-name">Chicago, IL</div>
           <div class="city-state">Illinois</div>
           <div class="city-note">World-class walkability, food, and distinct neighborhood character</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="dallas" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Dallas, TX</div>
+          <div class="city-state">Texas</div>
+          <div class="city-note">Booming finance and tech hub with walkable urban pockets</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="houston" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Houston, TX</div>
+          <div class="city-state">Texas</div>
+          <div class="city-note">America's most diverse city — Montrose, Midtown, The Heights</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="seattle" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Seattle, WA</div>
+          <div class="city-state">Washington</div>
+          <div class="city-note">Tech hub surrounded by mountains and water — highly walkable</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="phoenix" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Phoenix, AZ</div>
+          <div class="city-state">Arizona</div>
+          <div class="city-note">Sun Belt growth city with year-round sunshine and desert culture</div>
+        </div>
+        <div class="city-check">✓</div>
+      </div>
+      <div class="city-card" data-city="atlanta" onclick="selectCity(this)">
+        <div>
+          <div class="city-name">Atlanta, GA</div>
+          <div class="city-state">Georgia</div>
+          <div class="city-note">The South's capital — BeltLine trail, MARTA, strong cultural identity</div>
         </div>
         <div class="city-check">✓</div>
       </div>
