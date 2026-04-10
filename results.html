@@ -268,10 +268,11 @@ if (!results.length) {
   const bottom = document.createElement('div');
   bottom.className = 'bottom';
   bottom.innerHTML = `
-    <p>Not quite right? Adjust your priorities and run it again — a different weighting will produce a different ranking.</p>
+    <p style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:8px">Ready to find your specific places?</p>
+    <p style="margin-bottom:20px">See the actual coffee shops, gyms, faith communities, and markets near your top match — powered by live Google Places data.</p>
     <div class="bottom-btns">
-      <a href="find.html" class="btn-ghost">← Change my priorities</a>
-      <a href="index.html" class="btn-primary">Back to home</a>
+      <a href="places.html" class="btn-primary">Find my places →</a>
+      <a href="find.html" class="btn-ghost">← Change priorities</a>
     </div>`;
   page.appendChild(bottom);
 }

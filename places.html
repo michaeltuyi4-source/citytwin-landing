@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Places — CityTwin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#162F4A;
+  --navy-mid:#244B75;
+  --navy-soft:#2F5C8F;
+  --blue-pale:#E8EFF6;
+  --blue-mist:#F0F4F8;
+  --slate:#64748B;
+  --slate-light:#94A3B8;
+  --white:#FFFFFF;
+  --bg:#F7F9FB;
+  --amber:#C47B2B;
+  --amber-bg:#FDF5EA;
+  --green:#2A7A5A;
+  --green-bg:#EAF5EF;
+  --font-display:'DM Serif Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --radius-pill:100px;
+  --shadow-soft:0 2px 16px rgba(22,47,74,.07);
+  --shadow-card:0 4px 24px rgba(22,47,74,.10);
+}
+html{height:100%}
+body{font-family:var(--font-body);background:var(--bg);color:var(--navy);height:100%;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:200}
+.nav-logo{font-family:var(--font-display);font-size:1.2rem;color:var(--navy);text-decoration:none}
+.nav-back{font-size:.82rem;color:var(--slate);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:4px}
+.nav-back:hover{color:var(--navy)}
+
+/* HEADER */
+.page-header{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:16px 20px;flex-shrink:0}
+.neighborhood-name{font-family:var(--font-display);font-size:1.4rem;color:var(--navy);line-height:1.2;margin-bottom:2px}
+.neighborhood-name em{font-style:italic;color:var(--navy-soft)}
+.header-sub{font-size:.8rem;color:var(--slate)}
+
+/* CATEGORY TABS */
+.tabs-wrap{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:0 16px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:4px;padding:10px 0;width:max-content}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-pill);border:1.5px solid var(--blue-pale);background:var(--bg);font-family:var(--font-body);font-size:.78rem;font-weight:500;color:var(--slate);cursor:pointer;transition:all .18s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.tab:hover{border-color:var(--navy-mid);color:var(--navy)}
+.tab.active{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.tab-icon{font-size:.9rem}
+.tab-count{font-size:.68rem;background:rgba(255,255,255,.25);border-radius:10px;padding:1px 6px;font-weight:600}
+.tab.active .tab-count{background:rgba(255,255,255,.2)}
+.tab:not(.active) .tab-count{background:var(--blue-pale);color:var(--navy-mid)}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden;position:relative}
+
+/* MAP */
+#map{flex:1;min-height:0}
+.mapboxgl-popup-content{font-family:var(--font-body);padding:12px 14px;border-radius:12px;box-shadow:var(--shadow-card);border:1px solid var(--blue-pale);max-width:200px}
+.popup-name{font-weight:600;font-size:.82rem;color:var(--navy);margin-bottom:3px}
+.popup-rating{font-size:.74rem;color:var(--amber);margin-bottom:2px}
+.popup-address{font-size:.7rem;color:var(--slate);line-height:1.4}
+
+/* PLACES PANEL */
+.places-panel{width:340px;flex-shrink:0;background:var(--white);border-left:1px solid var(--blue-pale);display:flex;flex-direction:column;overflow:hidden}
+.panel-head{padding:14px 16px;border-bottom:1px solid var(--blue-pale);flex-shrink:0}
+.panel-title{font-weight:600;font-size:.88rem;color:var(--navy);margin-bottom:2px}
+.panel-sub{font-size:.74rem;color:var(--slate)}
+.places-list{flex:1;overflow-y:auto;padding:10px}
+.places-list::-webkit-scrollbar{width:4px}
+.places-list::-webkit-scrollbar-track{background:transparent}
+.places-list::-webkit-scrollbar-thumb{background:var(--blue-pale);border-radius:2px}
+
+/* PLACE CARD */
+.place-card{background:var(--bg);border:1px solid var(--blue-pale);border-radius:14px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.place-card:hover{border-color:var(--navy-mid);box-shadow:var(--shadow-soft);background:var(--white)}
+.place-card.highlighted{border-color:var(--navy);background:var(--blue-mist);box-shadow:var(--shadow-soft)}
+.place-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.place-name{font-weight:600;font-size:.86rem;color:var(--navy);line-height:1.3}
+.place-open{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill)}
+.place-open.open{background:var(--green-bg);color:var(--green)}
+.place-open.closed{background:#FEF2F2;color:#B91C1C}
+.place-open.unknown{background:var(--blue-mist);color:var(--slate)}
+.place-meta{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.place-rating{font-size:.76rem;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:3px}
+.place-reviews{font-size:.72rem;color:var(--slate-light)}
+.place-address{font-size:.74rem;color:var(--slate);line-height:1.4}
+
+/* LOADING STATE */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;flex:1}
+.loading-spinner{width:32px;height:32px;border:2.5px solid var(--blue-pale);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:.86rem;color:var(--slate)}
+
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;flex:1}
+.empty-icon{font-size:2rem;margin-bottom:12px;opacity:.5}
+.empty-title{font-weight:600;font-size:.9rem;color:var(--navy);margin-bottom:6px}
+.empty-sub{font-size:.8rem;color:var(--slate);line-height:1.6}
+
+/* MOBILE: stack vertically */
+@media(max-width:700px){
+  .main{flex-direction:column}
+  #map{height:300px;flex:none}
+  .places-panel{width:100%;border-left:none;border-top:1px solid var(--blue-pale);max-height:calc(100vh - 300px - 160px)}
+}
+
+/* NO RESULTS */
+.no-results{padding:20px;text-align:center;color:var(--slate);font-size:.82rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">CityTwin</a>
+  <a href="results.html" class="nav-back">← Back to results</a>
+</nav>
+
+<div class="page-header">
+  <div class="neighborhood-name" id="neighborhood-name">Finding your <em>places</em></div>
+  <div class="header-sub" id="header-sub">Loading your lifestyle map…</div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<div class="main">
+  <div id="map"></div>
+  <div class="places-panel">
+    <div class="panel-head">
+      <div class="panel-title" id="panel-title">Nearby places</div>
+      <div class="panel-sub" id="panel-sub">Select a category above</div>
+    </div>
+    <div class="places-list" id="places-list">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your places…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MAPBOX_TOKEN = 'pk.eyJ1IjoibWljaGFlbHR1eWk0IiwiYSI6ImNtbnQ2cmM3dTBrejgyeHEyb2M5YnRjc20ifQ.QMAQt71Igx8zSyLsuxsxEg';
+const API_BASE    = 'https://citytwin-api.azurewebsites.net/api/places';
+
+const CATEGORIES = [
+  { id:'coffeeShops',       label:'Coffee',     icon:'☕' },
+  { id:'foodScene',         label:'Food',        icon:'🍜' },
+  { id:'fitness',           label:'Fitness',     icon:'💪' },
+  { id:'faith',             label:'Faith',       icon:'⛪' },
+  { id:'outdoorSpaces',     label:'Outdoors',    icon:'🌳' },
+  { id:'nightlife',         label:'Nightlife',   icon:'🎵' },
+  { id:'culturalDiversity', label:'Markets',     icon:'🛒' },
+  { id:'familyFriendly',    label:'Family',      icon:'👨‍👩‍👧' },
+];
+
+// State
+let map, markers = [], activeCategory = null, placesCache = {};
+let neighborhoodName = '', neighborhoodCoords = null, userPriorities = {};
+
+// Load data from session
+function loadSession() {
+  try {
+    const results    = JSON.parse(sessionStorage.getItem('citytwin_results') || '[]');
+    const priorities = JSON.parse(sessionStorage.getItem('citytwin_priorities') || '{}');
+    userPriorities   = priorities;
+
+    if (results.length > 0) {
+      const top = results[0];
+      neighborhoodName   = top.name;
+      neighborhoodCoords = { lat: top.coords?.lat || 41.9088, lng: top.coords?.lng || -87.6788 };
+
+      document.getElementById('neighborhood-name').innerHTML =
+        `Your places in <em>${top.name}</em>`;
+      document.getElementById('header-sub').textContent =
+        `Showing real venues near ${top.name} — filtered by your priorities`;
+    } else {
+      // Fallback to Wicker Park for demo
+      neighborhoodName   = 'Wicker Park, Chicago';
+      neighborhoodCoords = { lat: 41.9088, lng: -87.6788 };
+      document.getElementById('neighborhood-name').innerHTML = `Your places in <em>Wicker Park</em>`;
+      document.getElementById('header-sub').textContent = 'Showing real venues near Wicker Park';
+    }
+  } catch(e) {
+    neighborhoodName   = 'Wicker Park, Chicago';
+    neighborhoodCoords = { lat: 41.9088, lng: -87.6788 };
+  }
+}
+
+// Init Mapbox
+function initMap() {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [neighborhoodCoords.lng, neighborhoodCoords.lat],
+    zoom: 14,
+  });
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
+
+  // Neighborhood center marker
+  new mapboxgl.Marker({ color: '#162F4A', scale: 0.8 })
+    .setLngLat([neighborhoodCoords.lng, neighborhoodCoords.lat])
+    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(
+      `<div class="popup-name">${neighborhoodName}</div>
+       <div class="popup-address">Your matched neighborhood</div>`
+    ))
+    .addTo(map);
+}
+
+// Build category tabs — prioritized categories first
+function buildTabs() {
+  const tabsEl = document.getElementById('tabs');
+
+  // Sort: user's priorities first, then rest
+  const priorityOrder = { 'must-have': 0, 'important': 1, 'nice-to-have': 2 };
+  const sorted = [...CATEGORIES].sort((a, b) => {
+    const pa = userPriorities[a.id] !== undefined ? priorityOrder[userPriorities[a.id]] : 10;
+    const pb = userPriorities[b.id] !== undefined ? priorityOrder[userPriorities[b.id]] : 10;
+    return pa - pb;
+  });
+
+  sorted.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tab';
+    btn.dataset.cat = cat.id;
+    btn.innerHTML = `<span class="tab-icon">${cat.icon}</span>${cat.label}<span class="tab-count">—</span>`;
+    btn.onclick = () => selectCategory(cat);
+    tabsEl.appendChild(btn);
+  });
+
+  // Auto-select first priority category
+  const firstPriority = sorted.find(c => userPriorities[c.id]);
+  if (firstPriority) selectCategory(firstPriority);
+  else selectCategory(sorted[0]);
+}
+
+// Select a category and fetch places
+async function selectCategory(cat) {
+  activeCategory = cat.id;
+
+  // Update tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat.id);
+  });
+
+  document.getElementById('panel-title').textContent = `${cat.icon} ${cat.label} nearby`;
+
+  // Use cache if available
+  if (placesCache[cat.id]) {
+    renderPlaces(placesCache[cat.id], cat);
+    return;
+  }
+
+  // Show loading
+  document.getElementById('places-list').innerHTML = `
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Finding ${cat.label.toLowerCase()} near ${neighborhoodName}…</div>
+    </div>`;
+
+  document.getElementById('panel-sub').textContent = `Searching near ${neighborhoodName}…`;
+
+  try {
+    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1500`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    const places = data.places || [];
+
+    // Cache results
+    placesCache[cat.id] = places;
+
+    // Update tab count
+    const tabBtn = document.querySelector(`.tab[data-cat="${cat.id}"] .tab-count`);
+    if (tabBtn) tabBtn.textContent = places.length;
+
+    renderPlaces(places, cat);
+
+  } catch(err) {
+    document.getElementById('places-list').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Couldn't load places</div>
+        <div class="empty-sub">Check your connection and try again.</div>
+      </div>`;
+    document.getElementById('panel-sub').textContent = 'Error loading places';
+  }
+}
+
+// Render place cards and map markers
+function renderPlaces(places, cat) {
+  // Clear old markers (keep center marker)
+  markers.forEach(m => m.remove());
+  markers = [];
+
+  const list = document.getElementById('places-list');
+
+  if (!places.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${cat.icon}</div>
+        <div class="empty-title">None found nearby</div>
+        <div class="empty-sub">No ${cat.label.toLowerCase()} found within 1.5km of ${neighborhoodName}. Try another category.</div>
+      </div>`;
+    document.getElementById('panel-sub').textContent = 'No results nearby';
+    return;
+  }
+
+  document.getElementById('panel-sub').textContent =
+    `${places.length} place${places.length !== 1 ? 's' : ''} within 1.5km`;
+
+  // Build cards
+  list.innerHTML = '';
+  places.forEach((place, i) => {
+    // Card
+    const card = document.createElement('div');
+    card.className = 'place-card';
+    card.dataset.index = i;
+
+    const openStatus = place.open === true
+      ? '<span class="place-open open">Open</span>'
+      : place.open === false
+      ? '<span class="place-open closed">Closed</span>'
+      : '<span class="place-open unknown">Hours vary</span>';
+
+    const stars = place.rating
+      ? '★'.repeat(Math.round(place.rating)) + '☆'.repeat(5 - Math.round(place.rating))
+      : '';
+
+    card.innerHTML = `
+      <div class="place-card-top">
+        <div class="place-name">${place.name}</div>
+        ${openStatus}
+      </div>
+      ${place.rating ? `
+        <div class="place-meta">
+          <span class="place-rating">${stars} ${place.rating}</span>
+          ${place.reviews ? `<span class="place-reviews">(${place.reviews.toLocaleString()} reviews)</span>` : ''}
+        </div>` : ''}
+      <div class="place-address">${place.address}</div>`;
+
+    card.onclick = () => focusPlace(place, i);
+    list.appendChild(card);
+
+    // Map marker
+    if (place.lat && place.lng) {
+      const el = document.createElement('div');
+      el.style.cssText = `
+        width:32px;height:32px;background:var(--navy);border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);border:2px solid white;cursor:pointer;
+        box-shadow:0 2px 8px rgba(22,47,74,.3);transition:transform .2s;
+        display:flex;align-items:center;justify-content:center;`;
+      const inner = document.createElement('div');
+      inner.style.cssText = `
+        transform:rotate(45deg);font-size:.75rem;line-height:1;`;
+      inner.textContent = cat.icon;
+      el.appendChild(inner);
+
+      const popup = new mapboxgl.Popup({ offset: 30, closeButton: false })
+        .setHTML(`
+          <div class="popup-name">${place.name}</div>
+          ${place.rating ? `<div class="popup-rating">${'★'.repeat(Math.round(place.rating))} ${place.rating}</div>` : ''}
+          <div class="popup-address">${place.address}</div>`);
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([place.lng, place.lat])
+        .setPopup(popup)
+        .addTo(map);
+
+      el.addEventListener('click', () => {
+        highlightCard(i);
+        scrollToCard(i);
+      });
+
+      markers.push(marker);
+    }
+  });
+
+  // Fit map to show all markers
+  if (places.length > 0 && markers.length > 0) {
+    const bounds = new mapboxgl.LngLatBounds();
+    bounds.extend([neighborhoodCoords.lng, neighborhoodCoords.lat]);
+    places.forEach(p => { if (p.lat && p.lng) bounds.extend([p.lng, p.lat]); });
+    map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 800 });
+  }
+}
+
+function focusPlace(place, index) {
+  if (!place.lat || !place.lng) return;
+  map.flyTo({ center: [place.lng, place.lat], zoom: 15.5, duration: 600 });
+  markers[index]?.togglePopup();
+  highlightCard(index);
+}
+
+function highlightCard(index) {
+  document.querySelectorAll('.place-card').forEach((c, i) => {
+    c.classList.toggle('highlighted', i === index);
+  });
+}
+
+function scrollToCard(index) {
+  const cards = document.querySelectorAll('.place-card');
+  if (cards[index]) {
+    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// Boot
+loadSession();
+initMap();
+map.on('load', () => buildTabs());
+</script>
+</body>
+</html>
