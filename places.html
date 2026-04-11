@@ -338,7 +338,7 @@ async function selectCategory(cat) {
   document.getElementById('panel-sub').textContent = `Searching near ${neighborhoodName}…`;
 
   try {
-    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1500`;
+    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1609`;
     const res  = await fetch(url);
     const data = await res.json();
     const places = data.places || [];
@@ -376,14 +376,14 @@ function renderPlaces(places, cat) {
       <div class="empty-state">
         <div class="empty-icon">${cat.icon}</div>
         <div class="empty-title">None found nearby</div>
-        <div class="empty-sub">No ${cat.label.toLowerCase()} found within 1.5km of ${neighborhoodName}. Try another category.</div>
+        <div class="empty-sub">No ${cat.label.toLowerCase()} found within 1 mile of ${neighborhoodName}. Try another category.</div>
       </div>`;
     document.getElementById('panel-sub').textContent = 'No results nearby';
     return;
   }
 
   document.getElementById('panel-sub').textContent =
-    `${places.length} place${places.length !== 1 ? 's' : ''} within 1.5km`;
+    `${places.length} place${places.length !== 1 ? 's' : ''} within 1 mile`;
 
   // Build cards
   list.innerHTML = '';
