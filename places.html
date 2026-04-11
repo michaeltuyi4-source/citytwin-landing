@@ -113,6 +113,16 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
 
 /* NO RESULTS */
 .no-results{padding:20px;text-align:center;color:var(--slate);font-size:.82rem}
+
+/* NEIGHBORHOOD SWITCHER */
+.switcher-wrap{background:var(--blue-mist);border-bottom:1px solid var(--blue-pale);padding:8px 16px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.switcher-wrap::-webkit-scrollbar{display:none}
+.switcher{display:flex;align-items:center;gap:6px;width:max-content}
+.switcher-label{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-light);margin-right:4px;white-space:nowrap}
+.switcher-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-pill);border:1.5px solid var(--blue-pale);background:var(--white);font-family:var(--font-body);font-size:.76rem;font-weight:500;color:var(--slate);cursor:pointer;transition:all .18s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.switcher-btn:hover{border-color:var(--navy-mid);color:var(--navy)}
+.switcher-btn.active{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.switcher-rank{font-size:.62rem;font-weight:700;opacity:.7}
 </style>
 </head>
 <body>
@@ -127,6 +137,12 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
   <div class="header-sub" id="header-sub">Loading your lifestyle map…</div>
 </div>
 
+
+<div class="switcher-wrap" id="switcher-wrap" style="display:none">
+  <div class="switcher" id="switcher">
+    <span class="switcher-label">Explore</span>
+  </div>
+</div>
 <div class="tabs-wrap">
   <div class="tabs" id="tabs"></div>
 </div>
@@ -166,22 +182,19 @@ const CATEGORIES = [
 let map, markers = [], activeCategory = null, placesCache = {};
 let neighborhoodName = '', neighborhoodCoords = null, userPriorities = {};
 
+// All matched neighborhoods
+let allResults = [];
+
 // Load data from session
 function loadSession() {
   try {
-    const results    = JSON.parse(sessionStorage.getItem('citytwin_results') || '[]');
+    allResults       = JSON.parse(sessionStorage.getItem('citytwin_results') || '[]');
     const priorities = JSON.parse(sessionStorage.getItem('citytwin_priorities') || '{}');
     userPriorities   = priorities;
 
-    if (results.length > 0) {
-      const top = results[0];
-      neighborhoodName   = top.name;
-      neighborhoodCoords = { lat: top.coords?.lat || 41.9088, lng: top.coords?.lng || -87.6788 };
-
-      document.getElementById('neighborhood-name').innerHTML =
-        `Your places in <em>${top.name}</em>`;
-      document.getElementById('header-sub').textContent =
-        `Showing real venues near ${top.name} — filtered by your priorities`;
+    if (allResults.length > 0) {
+      setNeighborhood(allResults[0]);
+      buildSwitcher();
     } else {
       // Fallback to Wicker Park for demo
       neighborhoodName   = 'Wicker Park, Chicago';
@@ -193,6 +206,61 @@ function loadSession() {
     neighborhoodName   = 'Wicker Park, Chicago';
     neighborhoodCoords = { lat: 41.9088, lng: -87.6788 };
   }
+}
+
+function setNeighborhood(n) {
+  neighborhoodName   = n.name;
+  neighborhoodCoords = { lat: n.coords?.lat || 41.9088, lng: n.coords?.lng || -87.6788 };
+  document.getElementById('neighborhood-name').innerHTML = `Your places in <em>${n.name}</em>`;
+  document.getElementById('header-sub').textContent = `Showing real venues near ${n.name} — filtered by your priorities`;
+}
+
+function buildSwitcher() {
+  if (allResults.length < 2) return; // no need for switcher with only 1 result
+  const wrap = document.getElementById('switcher-wrap');
+  const el   = document.getElementById('switcher');
+  wrap.style.display = 'block';
+  const rankLabels = ['#1 match', '#2 match', '#3 match'];
+  allResults.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'switcher-btn' + (i === 0 ? ' active' : '');
+    btn.dataset.index = i;
+    btn.innerHTML = `<span class="switcher-rank">${rankLabels[i] || '#' + (i+1)}</span>${r.name}`;
+    btn.onclick = () => switchNeighborhood(i);
+    el.appendChild(btn);
+  });
+}
+
+function switchNeighborhood(index) {
+  const n = allResults[index];
+  if (!n) return;
+
+  // Update active button
+  document.querySelectorAll('.switcher-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === index);
+  });
+
+  // Clear cache and markers for fresh results
+  placesCache = {};
+  markers.forEach(m => m.remove());
+  markers = [];
+
+  // Update neighborhood
+  setNeighborhood(n);
+
+  // Fly map to new neighborhood
+  if (map) {
+    map.flyTo({ center: [neighborhoodCoords.lng, neighborhoodCoords.lat], zoom: 14, duration: 800 });
+  }
+
+  // Reload current active category for new neighborhood
+  if (activeCategory) {
+    const cat = CATEGORIES.find(c => c.id === activeCategory);
+    if (cat) selectCategory(cat);
+  }
+
+  // Reset tab counts
+  document.querySelectorAll('.tab-count').forEach(t => t.textContent = '—');
 }
 
 // Init Mapbox
@@ -270,7 +338,7 @@ async function selectCategory(cat) {
   document.getElementById('panel-sub').textContent = `Searching near ${neighborhoodName}…`;
 
   try {
-    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1609`;
+    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1500`;
     const res  = await fetch(url);
     const data = await res.json();
     const places = data.places || [];
@@ -308,14 +376,14 @@ function renderPlaces(places, cat) {
       <div class="empty-state">
         <div class="empty-icon">${cat.icon}</div>
         <div class="empty-title">None found nearby</div>
-        <div class="empty-sub">No ${cat.label.toLowerCase()} found within 1 mile of ${neighborhoodName}. Try another category.</div>
+        <div class="empty-sub">No ${cat.label.toLowerCase()} found within 1.5km of ${neighborhoodName}. Try another category.</div>
       </div>`;
     document.getElementById('panel-sub').textContent = 'No results nearby';
     return;
   }
 
   document.getElementById('panel-sub').textContent =
-    `${places.length} place${places.length !== 1 ? 's' : ''} within 1 mile`;
+    `${places.length} place${places.length !== 1 ? 's' : ''} within 1.5km`;
 
   // Build cards
   list.innerHTML = '';
