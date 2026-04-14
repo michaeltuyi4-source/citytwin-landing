@@ -540,12 +540,22 @@ function toggleMapFullscreen() {
     mapEl.classList.add('map-fullscreen');
     panel.classList.add('panel-hidden');
     btn.classList.add('map-mode');
-    ico.textContent = '📋';
-    lbl.textContent = 'Show places';
+    // Fix: use fixed position + z-index above the fullscreen map
+    btn.style.position  = 'fixed';
+    btn.style.bottom    = '20px';
+    btn.style.right     = '16px';
+    btn.style.zIndex    = '500';
+    ico.textContent = '✕';
+    lbl.textContent = 'Close map';
   } else {
     mapEl.classList.remove('map-fullscreen');
     panel.classList.remove('panel-hidden');
     btn.classList.remove('map-mode');
+    // Reset to absolute inside map
+    btn.style.position  = 'absolute';
+    btn.style.bottom    = '12px';
+    btn.style.right     = '12px';
+    btn.style.zIndex    = '300';
     ico.textContent = '🗺️';
     lbl.textContent = 'Full map';
   }
