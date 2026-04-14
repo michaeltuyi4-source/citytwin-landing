@@ -104,11 +104,19 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
 .empty-title{font-weight:600;font-size:.9rem;color:var(--navy);margin-bottom:6px}
 .empty-sub{font-size:.8rem;color:var(--slate);line-height:1.6}
 
+/* MAP TOGGLE BUTTON */
+.map-toggle-btn{display:none;position:fixed;bottom:20px;right:20px;z-index:500;background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:10px 18px;font-family:var(--font-body);font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(22,47,74,.3);align-items:center;gap:6px;-webkit-tap-highlight-color:transparent}
+
 /* MOBILE: stack vertically */
 @media(max-width:700px){
-  .main{flex-direction:column}
-  #map{height:300px;flex:none}
-  .places-panel{width:100%;border-left:none;border-top:1px solid var(--blue-pale);max-height:calc(100vh - 300px - 160px)}
+  .main{flex-direction:column;position:relative}
+  #map{height:42vh;flex:none;transition:height .3s ease}
+  #map.map-fullscreen{height:100vh;position:fixed;top:0;left:0;right:0;z-index:400}
+  .places-panel{width:100%;border-left:none;border-top:1px solid var(--blue-pale);flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:all .3s ease}
+  .places-panel.panel-hidden{display:none}
+  .places-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px}
+  .map-toggle-btn{display:flex}
+  .map-toggle-btn.map-mode{background:var(--white);color:var(--navy);border:1.5px solid var(--blue-pale)}
 }
 
 /* NO RESULTS */
@@ -149,10 +157,27 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
 
 <div class="main">
   <div id="map"></div>
+  <button class="map-toggle-btn" id="map-toggle-btn" onclick="toggleMapFullscreen()">
+    <span id="map-toggle-icon">🗺️</span>
+    <span id="map-toggle-label">Full map</span>
+  </button>
   <div class="places-panel">
     <div class="panel-head">
       <div class="panel-title" id="panel-title">Nearby places</div>
       <div class="panel-sub" id="panel-sub">Select a category above</div>
+    </div>
+    <div style="padding:10px 12px;border-bottom:1px solid var(--blue-pale);flex-shrink:0">
+      <div style="position:relative">
+        <input id="address-search" type="text" placeholder="Search an address to measure distance…"
+          style="width:100%;padding:9px 36px 9px 12px;border:1.5px solid var(--blue-pale);border-radius:10px;font-family:var(--font-body);font-size:.78rem;color:var(--navy);background:var(--bg);outline:none"
+          oninput="handleAddressSearch(this.value)"
+          onfocus="this.style.borderColor='var(--navy-mid)'"
+          onblur="this.style.borderColor='var(--blue-pale)'"
+        />
+        <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none">🔍</span>
+      </div>
+      <div id="search-results" style="display:none;background:var(--white);border:1px solid var(--blue-pale);border-radius:10px;margin-top:4px;max-height:160px;overflow-y:auto;box-shadow:var(--shadow-soft)"></div>
+      <div id="search-pin-info" style="display:none;font-size:.74rem;color:var(--navy-soft);margin-top:6px;padding:6px 8px;background:var(--blue-mist);border-radius:8px"></div>
     </div>
     <div class="places-list" id="places-list">
       <div class="loading-state">
@@ -168,14 +193,18 @@ const MAPBOX_TOKEN = 'pk.eyJ1IjoibWljaGFlbHR1eWk0IiwiYSI6ImNtbnQ2cmM3dTBrejgyeHE
 const API_BASE    = 'https://citytwin-api.azurewebsites.net/api/places';
 
 const CATEGORIES = [
-  { id:'coffeeShops',       label:'Coffee',     icon:'☕' },
-  { id:'foodScene',         label:'Food',        icon:'🍜' },
-  { id:'fitness',           label:'Fitness',     icon:'💪' },
-  { id:'faith',             label:'Faith',       icon:'⛪' },
-  { id:'outdoorSpaces',     label:'Outdoors',    icon:'🌳' },
-  { id:'nightlife',         label:'Nightlife',   icon:'🎵' },
-  { id:'culturalDiversity', label:'Markets',     icon:'🛒' },
-  { id:'familyFriendly',    label:'Family',      icon:'👨‍👩‍👧' },
+  { id:'coffeeShops',       label:'Coffee',        icon:'☕' },
+  { id:'foodScene',         label:'Food',           icon:'🍜' },
+  { id:'fitness',           label:'Fitness',        icon:'💪' },
+  { id:'faith',             label:'Faith',          icon:'⛪' },
+  { id:'outdoorSpaces',     label:'Outdoors',       icon:'🌳' },
+  { id:'nightlife',         label:'Nightlife',      icon:'🎵' },
+  { id:'culturalDiversity', label:'Int'l Markets', icon:'🌍' },
+  { id:'grocery',           label:'Grocery',        icon:'🛒' },
+  { id:'familyFriendly',    label:'Family',         icon:'👨‍👩‍👧' },
+  { id:'shopping',          label:'Shopping',       icon:'🛍️' },
+  { id:'entertainment',     label:'Entertainment',  icon:'🎭' },
+  { id:'trails',            label:'Trails',         icon:'🥾' },
 ];
 
 // State
@@ -479,6 +508,104 @@ function scrollToCard(index) {
   if (cards[index]) {
     cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+}
+
+// MAP FULLSCREEN TOGGLE
+let mapFullscreen = false;
+function toggleMapFullscreen() {
+  mapFullscreen = !mapFullscreen;
+  const mapEl    = document.getElementById('map');
+  const panel    = document.querySelector('.places-panel');
+  const btn      = document.getElementById('map-toggle-btn');
+  const lbl      = document.getElementById('map-toggle-label');
+  const ico      = document.getElementById('map-toggle-icon');
+
+  if (mapFullscreen) {
+    mapEl.classList.add('map-fullscreen');
+    panel.classList.add('panel-hidden');
+    btn.classList.add('map-mode');
+    ico.textContent = '📋';
+    lbl.textContent = 'Show places';
+  } else {
+    mapEl.classList.remove('map-fullscreen');
+    panel.classList.remove('panel-hidden');
+    btn.classList.remove('map-mode');
+    ico.textContent = '🗺️';
+    lbl.textContent = 'Full map';
+  }
+  setTimeout(() => map.resize(), 350);
+}
+
+// ADDRESS SEARCH
+let searchMarker = null, searchTimeout = null;
+async function handleAddressSearch(val) {
+  const resultsEl = document.getElementById('search-results');
+  const pinInfo   = document.getElementById('search-pin-info');
+  if (val.length < 3) { resultsEl.style.display='none'; return; }
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    try {
+      const res  = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(val)}.json?access_token=${MAPBOX_TOKEN}&limit=4&country=us`);
+      const data = await res.json();
+      if (!data.features?.length) { resultsEl.style.display='none'; return; }
+      resultsEl.style.display = 'block';
+      resultsEl.innerHTML = data.features.map(f => `
+        <div onclick="selectAddress(${f.center[1]}, ${f.center[0]}, '${f.place_name.replace(/'/g,"\'")}' )"
+          style="padding:10px 12px;font-size:.78rem;color:var(--navy);cursor:pointer;border-bottom:1px solid var(--blue-pale);line-height:1.4"
+          onmouseover="this.style.background='var(--blue-mist)'" onmouseout="this.style.background=''">
+          📍 ${f.place_name}
+        </div>`).join('');
+    } catch(e) { resultsEl.style.display='none'; }
+  }, 400);
+}
+
+function selectAddress(lat, lng, name) {
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('address-search').value = name;
+
+  // Remove old search marker
+  if (searchMarker) searchMarker.remove();
+
+  // Add amber pin for searched address
+  const el = document.createElement('div');
+  el.style.cssText = 'width:14px;height:14px;background:#C47B2B;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(196,123,43,.5)';
+  searchMarker = new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map);
+  map.flyTo({ center: [lng, lat], zoom: 14, duration: 600 });
+
+  // Show distances from this pin to all visible place markers
+  showDistances(lat, lng, name);
+}
+
+function showDistances(fromLat, fromLng, fromName) {
+  const pinInfo = document.getElementById('search-pin-info');
+  const list    = document.getElementById('places-list');
+  const cards   = list.querySelectorAll('.place-card');
+  if (!cards.length) { pinInfo.style.display='none'; return; }
+
+  // Update each card with distance
+  const currentPlaces = placesCache[activeCategory] || [];
+  cards.forEach((card, i) => {
+    const place = currentPlaces[i];
+    if (!place?.lat || !place?.lng) return;
+    const dist = haversine(fromLat, fromLng, place.lat, place.lng);
+    const distEl = card.querySelector('.place-distance') || document.createElement('div');
+    distEl.className = 'place-distance';
+    distEl.style.cssText = 'font-size:.7rem;color:var(--navy-soft);font-weight:600;margin-top:4px';
+    distEl.textContent = `📍 ${dist.toFixed(1)} mi from your address`;
+    if (!card.querySelector('.place-distance')) card.appendChild(distEl);
+    else card.querySelector('.place-distance').textContent = distEl.textContent;
+  });
+
+  pinInfo.style.display = 'block';
+  pinInfo.textContent = `📍 Showing distances from: ${fromName.split(',')[0]}`;
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 3958.8; // miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 // Boot

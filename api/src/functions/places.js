@@ -9,11 +9,15 @@ const CATEGORY_QUERIES = {
   nightlife:         'bar',
   familyFriendly:    'playground',
   culturalDiversity: 'international grocery store',
+  grocery:           'grocery store supermarket',
   affordability:     null,
   quietResidential:  null,
   faith:             'church OR mosque OR temple OR synagogue',
   fitness:           'gym',
   markets:           'international market',
+  shopping:          'shopping mall',
+  entertainment:     'stadium OR concert hall OR theater OR event center',
+  trails:            'hiking trail OR nature trail OR greenway',
 };
 
 app.http('places', {
