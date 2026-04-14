@@ -105,18 +105,34 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
 .empty-sub{font-size:.8rem;color:var(--slate);line-height:1.6}
 
 /* MAP TOGGLE BUTTON */
-.map-toggle-btn{display:none;position:fixed;bottom:20px;right:20px;z-index:500;background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:10px 18px;font-family:var(--font-body);font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(22,47,74,.3);align-items:center;gap:6px;-webkit-tap-highlight-color:transparent}
+.map-toggle-btn{display:none;position:absolute;bottom:12px;right:12px;z-index:300;background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-pill);padding:8px 14px;font-family:var(--font-body);font-size:.76rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(22,47,74,.3);align-items:center;gap:6px;-webkit-tap-highlight-color:transparent}
 
 /* MOBILE: stack vertically */
 @media(max-width:700px){
-  .main{flex-direction:column;position:relative}
-  #map{height:42vh;flex:none;transition:height .3s ease}
+  .main{flex-direction:column;position:relative;flex:1;min-height:0}
+  #map{height:35vh;flex:none;transition:height .3s ease}
   #map.map-fullscreen{height:100vh;position:fixed;top:0;left:0;right:0;z-index:400}
   .places-panel{width:100%;border-left:none;border-top:1px solid var(--blue-pale);flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:all .3s ease}
   .places-panel.panel-hidden{display:none}
-  .places-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px}
+  .places-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px}
   .map-toggle-btn{display:flex}
   .map-toggle-btn.map-mode{background:var(--white);color:var(--navy);border:1.5px solid var(--blue-pale)}
+  .panel-head{padding:8px 12px}
+  .panel-title{font-size:.82rem}
+  .panel-sub{font-size:.7rem}
+
+  /* Compress top chrome on mobile */
+  nav{padding:8px 16px}
+  .nav-logo{font-size:1rem}
+  .nav-back{font-size:.76rem}
+  .page-header{padding:8px 16px}
+  .neighborhood-name{font-size:1.1rem;margin-bottom:1px}
+  .header-sub{font-size:.72rem}
+  .switcher-wrap{padding:5px 12px}
+  .switcher-btn{padding:4px 10px;font-size:.72rem}
+  .tabs-wrap{padding:0 10px}
+  .tabs{padding:6px 0;gap:3px}
+  .tab{padding:6px 10px;font-size:.74rem}
 }
 
 /* NO RESULTS */
@@ -155,7 +171,7 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
   <div class="tabs" id="tabs"></div>
 </div>
 
-<div class="main">
+<div class="main" style="position:relative">
   <div id="map"></div>
   <button class="map-toggle-btn" id="map-toggle-btn" onclick="toggleMapFullscreen()">
     <span id="map-toggle-icon">🗺️</span>
@@ -166,10 +182,10 @@ nav{background:var(--white);border-bottom:1px solid var(--blue-pale);padding:14p
       <div class="panel-title" id="panel-title">Nearby places</div>
       <div class="panel-sub" id="panel-sub">Select a category above</div>
     </div>
-    <div style="padding:10px 12px;border-bottom:1px solid var(--blue-pale);flex-shrink:0">
+    <div style="padding:7px 10px;border-bottom:1px solid var(--blue-pale);flex-shrink:0">
       <div style="position:relative">
-        <input id="address-search" type="text" placeholder="Search an address to measure distance…"
-          style="width:100%;padding:9px 36px 9px 12px;border:1.5px solid var(--blue-pale);border-radius:10px;font-family:var(--font-body);font-size:.78rem;color:var(--navy);background:var(--bg);outline:none"
+        <input id="address-search" type="text" placeholder="Search address to measure distance…"
+          style="width:100%;padding:7px 32px 7px 10px;border:1.5px solid var(--blue-pale);border-radius:10px;font-family:var(--font-body);font-size:.76rem;color:var(--navy);background:var(--bg);outline:none"
           oninput="handleAddressSearch(this.value)"
           onfocus="this.style.borderColor='var(--navy-mid)'"
           onblur="this.style.borderColor='var(--blue-pale)'"
