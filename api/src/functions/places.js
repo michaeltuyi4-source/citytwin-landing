@@ -1,106 +1,197 @@
+// CityTwin Azure Function — api/src/functions/places.js
+// Handles two routes:
+//   1. ?lat=&lng=&type=  → nearby places search (existing)
+//   2. ?type=photo&placeid=  → Google Places photo proxy (NEW)
+//
+// Security:
+//   - CORS restricted to citytwinapp.com (+ localhost for dev)
+//   - API key never exposed to client
+//   - Rate limiting handled by Azure API Management (Stage 3)
+
 const { app } = require('@azure/functions');
 
+const GOOGLE_KEY    = process.env.GOOGLE_PLACES_KEY;
+const ALLOWED_ORIGINS = [
+  'https://www.citytwinapp.com',
+  'https://citytwinapp.com',
+  'http://localhost:3000',    // local dev
+  'http://127.0.0.1:5500',   // VS Code Live Server
+];
+
+// Shared CORS headers builder
+function corsHeaders(requestOrigin) {
+  const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+    ? requestOrigin
+    : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin':  origin,
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'X-Content-Type-Options':       'nosniff',
+    'X-Frame-Options':              'DENY',
+    'Cache-Control':                'public, max-age=3600',  // cache 1hr
+  };
+}
+
+// ─── Category → Google Places type mapping ───────────────────────────────────
 const CATEGORY_QUERIES = {
-  walkability:       null,
-  transitAccess:     null,
-  foodScene:         'restaurant',
-  coffeeShops:       'coffee shop',
-  outdoorSpaces:     'park',
-  nightlife:         'bar',
-  familyFriendly:    'playground',
-  culturalDiversity: 'international grocery store',
-  grocery:           'grocery store supermarket',
-  affordability:     null,
-  quietResidential:  null,
-  faith:             'church OR mosque OR temple OR synagogue',
-  fitness:           'gym',
-  markets:           'international market',
-  shopping:          'shopping mall',
-  entertainment:     'stadium OR concert hall OR theater OR event center',
-  trails:            'hiking trail OR nature trail OR greenway',
+  coffee:        'coffee shop',
+  food:          'restaurant',
+  fitness:       'gym',
+  faith:         'church OR mosque OR synagogue OR temple',
+  outdoors:      'park',
+  nightlife:     'bar OR nightclub',
+  markets:       'international grocery store',
+  grocery:       'grocery store supermarket',
+  family:        'family activities playground',
+  shopping:      'shopping center mall',
+  entertainment: 'theater OR cinema OR entertainment',
+  trails:        'hiking trail OR nature trail',
 };
 
+// ─── MAIN HANDLER ─────────────────────────────────────────────────────────────
 app.http('places', {
-  methods: ['GET'],
+  methods:   ['GET', 'OPTIONS'],
   authLevel: 'anonymous',
   handler: async (request, context) => {
 
-    // CORS headers so your frontend can call this
-    const headers = {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    };
+    const origin  = request.headers.get('origin') || '';
+    const headers = corsHeaders(origin);
+
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return { status: 204, headers };
+    }
+
+    const params  = new URL(request.url).searchParams;
+    const reqType = params.get('type');
+
+    // ── Route 1: Photo proxy (NEW) ──────────────────────────────────────────
+    // Called by the landing page to load real neighborhood photos.
+    // Strategy: text search for a well-known landmark in the neighborhood,
+    // then fetch a photo from that place. More reliable than neighborhood
+    // Place IDs which Google doesn't consistently support.
+    //
+    // Query: ?type=photo&neighborhood=NoDa Charlotte NC
+    // Returns: { photoUrl: "https://..." } or { photoUrl: null }
+    if (reqType === 'photo') {
+      const neighborhood = params.get('neighborhood');
+      if (!neighborhood) {
+        return {
+          status:  400,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ error: 'neighborhood param required' }),
+        };
+      }
+
+      try {
+        // Step 1: Text search for the neighborhood to get a place with photos
+        const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
+        searchUrl.searchParams.set('query', neighborhood);
+        searchUrl.searchParams.set('key', GOOGLE_KEY);
+
+        const searchRes  = await fetch(searchUrl.toString());
+        const searchData = await searchRes.json();
+
+        // Find first result that has photos
+        const placeWithPhoto = (searchData.results || []).find(
+          r => r.photos && r.photos.length > 0
+        );
+
+        if (!placeWithPhoto) {
+          return {
+            status:  200,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ photoUrl: null }),
+          };
+        }
+
+        const photoRef = placeWithPhoto.photos[0].photo_reference;
+
+        // Step 2: Fetch the actual photo — Google redirects to CDN URL
+        const photoUrl = new URL('https://maps.googleapis.com/maps/api/place/photo');
+        photoUrl.searchParams.set('maxwidth', '800');
+        photoUrl.searchParams.set('photo_reference', photoRef);
+        photoUrl.searchParams.set('key', GOOGLE_KEY);
+
+        const photoRes = await fetch(photoUrl.toString(), { redirect: 'follow' });
+        const finalUrl = photoRes.url;
+
+        return {
+          status:  200,
+          headers: {
+            ...headers,
+            'Content-Type':  'application/json',
+            'Cache-Control': 'public, max-age=86400',  // cache 24hrs
+          },
+          body: JSON.stringify({ photoUrl: finalUrl }),
+        };
+
+      } catch (err) {
+        context.error('Photo proxy error:', err);
+        return {
+          status:  200,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ photoUrl: null, error: err.message }),
+        };
+      }
+    }
+
+    // ── Route 2: Nearby places search (existing) ────────────────────────────
+    // Query: ?lat=&lng=&type=CATEGORY&radius=1609
+    const lat      = parseFloat(params.get('lat'));
+    const lng      = parseFloat(params.get('lng'));
+    const category = params.get('type') || 'coffee';
+    const radius   = parseInt(params.get('radius') || '1609', 10);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return {
+        status:  400,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ error: 'lat and lng required' }),
+      };
+    }
+
+    const keyword = CATEGORY_QUERIES[category] || category;
 
     try {
-      const lat      = request.query.get('lat');
-      const lng      = request.query.get('lng');
-      const category = request.query.get('category');
-      const radius   = request.query.get('radius') || '1500';
+      const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json');
+      searchUrl.searchParams.set('location', `${lat},${lng}`);
+      searchUrl.searchParams.set('radius', radius.toString());
+      searchUrl.searchParams.set('keyword', keyword);
+      searchUrl.searchParams.set('key', GOOGLE_KEY);
 
-      // Validate inputs
-      if (!lat || !lng || !category) {
-        return {
-          status: 400,
-          headers,
-          body: JSON.stringify({ error: 'lat, lng, and category are required' }),
-        };
+      const searchRes  = await fetch(searchUrl.toString());
+      const searchData = await searchRes.json();
+
+      if (searchData.status !== 'OK' && searchData.status !== 'ZERO_RESULTS') {
+        throw new Error(`Places API: ${searchData.status}`);
       }
 
-      const query = CATEGORY_QUERIES[category];
-      if (!query) {
-        return {
-          status: 200,
-          headers,
-          body: JSON.stringify({ places: [] }),
-        };
-      }
-
-      const key = process.env.GOOGLE_PLACES_KEY;
-
-      // Call Google Places Text Search API
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json` +
-        `?query=${encodeURIComponent(query)}` +
-        `&location=${lat},${lng}` +
-        `&radius=${radius}` +
-        `&key=${key}`;
-
-      const response = await fetch(url);
-      const data     = await response.json();
-
-      if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-        context.log('Google Places error:', data.status, data.error_message);
-        return {
-          status: 502,
-          headers,
-          body: JSON.stringify({ error: 'Google Places API error', status: data.status }),
-        };
-      }
-
-      // Shape the results — only send what the frontend needs
-      const places = (data.results || []).slice(0, 6).map(p => ({
-        id:       p.place_id,
-        name:     p.name,
-        address:  p.formatted_address,
-        rating:   p.rating || null,
-        reviews:  p.user_ratings_total || 0,
-        lat:      p.geometry?.location?.lat,
-        lng:      p.geometry?.location?.lng,
-        open:     p.opening_hours?.open_now ?? null,
-        photo:    p.photos?.[0]?.photo_reference || null,
+      const results = (searchData.results || []).slice(0, 10).map(place => ({
+        place_id:  place.place_id,
+        name:      place.name,
+        rating:    place.rating || null,
+        vicinity:  place.vicinity,
+        open_now:  place.opening_hours?.open_now ?? null,
+        lat:       place.geometry?.location?.lat,
+        lng:       place.geometry?.location?.lng,
+        // Include photo reference so client can call ?type=photo&placeid= if needed
+        has_photo: (place.photos?.length || 0) > 0,
       }));
 
       return {
-        status: 200,
-        headers,
-        body: JSON.stringify({ places, category }),
+        status:  200,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ results, status: searchData.status }),
       };
 
     } catch (err) {
-      context.log('Function error:', err.message);
+      context.error('Places search error:', err);
       return {
-        status: 500,
-        headers,
-        body: JSON.stringify({ error: 'Internal server error' }),
+        status:  500,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ error: err.message }),
       };
     }
   },
