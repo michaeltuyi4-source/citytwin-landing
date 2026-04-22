@@ -174,7 +174,64 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   position:relative;overflow:hidden;min-height:620px;
 }
 
-/* Hero photo panel */
+/* ─── HERO SLIDESHOW ─── */
+.hero-slideshow{position:absolute;inset:0;z-index:0}
+.hero-slide{
+  position:absolute;inset:0;opacity:0;
+  background-size:cover;background-position:center;
+  transition:opacity 1.2s ease;
+}
+.hero-slide.active{opacity:1}
+.hero-slide::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(
+    to right,
+    rgba(242,246,251,.65) 0%,
+    rgba(242,246,251,.08) 40%,
+    transparent 100%
+  );
+}
+@media(max-width:960px){
+  .hero-slide::after{
+    background:linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(242,246,251,.5) 70%,
+      rgba(242,246,251,1) 100%
+    );
+  }
+}
+.hero-dots{
+  position:absolute;bottom:20px;right:20px;
+  display:flex;gap:6px;z-index:4;
+}
+.hero-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.45);
+  cursor:pointer;transition:background .3s,transform .3s;
+  border:none;padding:0;
+}
+.hero-dot.active{background:var(--amber);transform:scale(1.3)}
+
+/* ─── PHOTO BANNER SLIDESHOW ─── */
+.pb-slide{
+  position:absolute;inset:0;opacity:0;
+  background-size:cover;background-position:center 30%;
+  transition:opacity 1.2s ease;
+  border-radius:22px;
+}
+.pb-slide.active{opacity:1}
+.pb-dots{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:4;
+}
+.pb-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.4);
+  cursor:pointer;transition:background .3s,transform .3s;
+  border:none;padding:0;
+}
+.pb-dot.active{background:var(--white);transform:scale(1.3)}
 .hr-bg{
   position:absolute;inset:0;
   background:url('/images/couple_taking_a_walk_bold.jpg') center center / cover no-repeat;
@@ -187,6 +244,16 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
     rgba(242,246,251,.08) 40%,
     transparent 100%
   );
+}
+@media(max-width:960px){
+  .hr-bg::after{
+    background:linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(242,246,251,.5) 70%,
+      rgba(242,246,251,1) 100%
+    );
+  }
 }
 .hr-grid{display:none}
 .hr-skyline{display:none}
@@ -210,10 +277,11 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   padding:16px 20px;
   box-shadow:0 16px 48px rgba(0,0,0,.25);
   animation:floatY 7s ease-in-out infinite;
+  z-index:3;
 }
-.fc-a{top:13%;left:5%;animation-duration:7s;animation-delay:0s}
-.fc-b{top:46%;right:4%;animation-duration:8.5s;animation-delay:2.2s}
-.fc-c{bottom:19%;left:7%;animation-duration:6.5s;animation-delay:4.1s}
+.fc-a{bottom:22%;left:4%;animation-duration:7s;animation-delay:0s;max-width:230px}
+.fc-b{bottom:8%;right:4%;animation-duration:8.5s;animation-delay:2.2s}
+.fc-c{top:12%;right:4%;animation-duration:6.5s;animation-delay:4.1s;max-width:208px}
 
 .fc-label{
   font-size:.58rem;font-weight:700;letter-spacing:.12em;
@@ -561,8 +629,10 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
 /* ─── RESPONSIVE ─── */
 @media(max-width:960px){
   .hero{grid-template-columns:1fr}
-  .hero-right{min-height:380px}
+  .hero-right{min-height:300px}
   .hero-left{padding:60px 28px 48px}
+  .fc{display:none}
+  .pin{display:none}
   .steps{grid-template-columns:1fr}
   .steps::before{display:none}
   .community{grid-template-columns:1fr;padding:64px 28px}
@@ -634,15 +704,11 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
 @media(max-width:960px){
   .nav{padding:0 20px}
   .nav-links{display:none}
-  .nav-demo{
-    padding:7px 13px;
-    font-size:.72rem;
-  }
-}
-@media(max-width:400px){
-  .nav-demo span{display:none}
-  .nav-demo::after{content:'Demo'}
+  .nav-demo{padding:7px 13px;font-size:.72rem}
   .nav-cta{padding:7px 13px;font-size:.72rem}
+}
+@media(max-width:380px){
+  .nav-demo{display:none}
   .demo-modal{padding:32px 24px 28px}
   .demo-title{font-size:1.6rem}
 }
@@ -731,108 +797,19 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
     </div>
   </div>
 
-  <!-- RIGHT: visual panel -->
+  <!-- RIGHT: photo slideshow -->
   <div class="hero-right">
-    <div class="hr-bg"></div>
-    <div class="hr-grid"></div>
+    <div class="hero-slideshow">
+      <div class="hero-slide active" style="background-image:url('/images/couple_taking_a_walk_bold.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('/images/pexelslilianadrew8555390.jpg');background-position:center 20%"></div>
+      <div class="hero-slide" style="background-image:url('/images/pexelslilianadrew8555388.jpg')"></div>
+    </div>
 
-    <!-- Building skyline SVG -->
-    <svg class="hr-skyline" viewBox="0 0 800 380" fill="none" preserveAspectRatio="xMidYMax slice" style="position:absolute;bottom:0;left:0;width:100%;height:48%">
-      <!-- Buildings with window grids -->
-      <rect x="0" y="180" width="70" height="200" fill="rgba(22,47,74,.55)"/>
-      <rect x="5" y="190" width="60" height="190" fill="none" stroke="none"/>
-      <!-- Windows b1 -->
-      <rect x="12" y="195" width="10" height="12" rx="1" fill="rgba(255,230,140,.15)"/>
-      <rect x="28" y="195" width="10" height="12" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="44" y="195" width="10" height="12" rx="1" fill="rgba(255,230,140,.12)"/>
-      <rect x="12" y="216" width="10" height="12" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="28" y="216" width="10" height="12" rx="1" fill="rgba(255,230,140,.1)"/>
-      <rect x="44" y="216" width="10" height="12" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="12" y="237" width="10" height="12" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="28" y="237" width="10" height="12" rx="1" fill="rgba(255,230,140,.22)"/>
-
-      <rect x="75" y="120" width="90" height="260" fill="rgba(22,47,74,.6)"/>
-      <rect x="82" y="132" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="100" y="132" width="12" height="14" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="118" y="132" width="12" height="14" rx="1" fill="rgba(255,230,140,.25)"/>
-      <rect x="136" y="132" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="82" y="156" width="12" height="14" rx="1" fill="rgba(255,230,140,.1)"/>
-      <rect x="100" y="156" width="12" height="14" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="118" y="156" width="12" height="14" rx="1" fill="rgba(255,230,140,.16)"/>
-      <rect x="136" y="156" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="82" y="180" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="100" y="180" width="12" height="14" rx="1" fill="rgba(255,230,140,.12)"/>
-
-      <rect x="170" y="200" width="55" height="180" fill="rgba(22,47,74,.48)"/>
-      <rect x="178" y="212" width="9" height="11" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="193" y="212" width="9" height="11" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="208" y="212" width="9" height="11" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="178" y="232" width="9" height="11" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="193" y="232" width="9" height="11" rx="1" fill="rgba(255,230,140,.1)"/>
-      <rect x="208" y="232" width="9" height="11" rx="1" fill="rgba(255,230,140,.18)"/>
-
-      <rect x="230" y="80" width="110" height="300" fill="rgba(22,47,74,.65)"/>
-      <!-- Antenna -->
-      <rect x="282" y="60" width="4" height="22" fill="rgba(22,47,74,.65)"/>
-      <rect x="232" y="95" width="12" height="14" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="252" y="95" width="12" height="14" rx="1" fill="rgba(255,230,140,.16)"/>
-      <rect x="272" y="95" width="12" height="14" rx="1" fill="rgba(255,230,140,.25)"/>
-      <rect x="292" y="95" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="312" y="95" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="232" y="118" width="12" height="14" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="252" y="118" width="12" height="14" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="272" y="118" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="292" y="118" width="12" height="14" rx="1" fill="rgba(255,230,140,.12)"/>
-      <rect x="312" y="118" width="12" height="14" rx="1" fill="rgba(255,230,140,.24)"/>
-      <rect x="232" y="141" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="252" y="141" width="12" height="14" rx="1" fill="rgba(255,230,140,.1)"/>
-      <rect x="272" y="141" width="12" height="14" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="292" y="141" width="12" height="14" rx="1" fill="rgba(255,230,140,.16)"/>
-      <rect x="312" y="141" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-
-      <rect x="345" y="160" width="75" height="220" fill="rgba(22,47,74,.52)"/>
-      <rect x="354" y="172" width="10" height="13" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="371" y="172" width="10" height="13" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="388" y="172" width="10" height="13" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="354" y="193" width="10" height="13" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="371" y="193" width="10" height="13" rx="1" fill="rgba(255,230,140,.12)"/>
-      <rect x="388" y="193" width="10" height="13" rx="1" fill="rgba(255,230,140,.18)"/>
-
-      <rect x="425" y="100" width="95" height="280" fill="rgba(22,47,74,.6)"/>
-      <rect x="434" y="114" width="12" height="14" rx="1" fill="rgba(255,230,140,.24)"/>
-      <rect x="453" y="114" width="12" height="14" rx="1" fill="rgba(255,230,140,.16)"/>
-      <rect x="472" y="114" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="491" y="114" width="12" height="14" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="434" y="136" width="12" height="14" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="453" y="136" width="12" height="14" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="472" y="136" width="12" height="14" rx="1" fill="rgba(255,230,140,.1)"/>
-      <rect x="491" y="136" width="12" height="14" rx="1" fill="rgba(255,230,140,.2)"/>
-
-      <rect x="525" y="190" width="60" height="190" fill="rgba(22,47,74,.48)"/>
-      <rect x="534" y="202" width="9" height="11" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="549" y="202" width="9" height="11" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="564" y="202" width="9" height="11" rx="1" fill="rgba(255,230,140,.14)"/>
-
-      <rect x="590" y="140" width="80" height="240" fill="rgba(22,47,74,.56)"/>
-      <rect x="598" y="152" width="11" height="13" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="617" y="152" width="11" height="13" rx="1" fill="rgba(255,230,140,.15)"/>
-      <rect x="636" y="152" width="11" height="13" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="655" y="152" width="11" height="13" rx="1" fill="rgba(255,230,140,.17)"/>
-      <rect x="598" y="174" width="11" height="13" rx="1" fill="rgba(255,230,140,.13)"/>
-      <rect x="617" y="174" width="11" height="13" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="636" y="174" width="11" height="13" rx="1" fill="rgba(255,230,140,.16)"/>
-
-      <rect x="675" y="170" width="65" height="210" fill="rgba(22,47,74,.5)"/>
-      <rect x="683" y="182" width="10" height="12" rx="1" fill="rgba(255,230,140,.18)"/>
-      <rect x="699" y="182" width="10" height="12" rx="1" fill="rgba(255,230,140,.22)"/>
-      <rect x="715" y="182" width="10" height="12" rx="1" fill="rgba(255,230,140,.14)"/>
-      <rect x="683" y="202" width="10" height="12" rx="1" fill="rgba(255,230,140,.2)"/>
-      <rect x="699" y="202" width="10" height="12" rx="1" fill="rgba(255,230,140,.1)"/>
-
-      <rect x="745" y="210" width="55" height="170" fill="rgba(22,47,74,.46)"/>
-      <!-- Street level warm line -->
-      <rect x="0" y="378" width="800" height="2" fill="rgba(196,123,43,.3)"/>
-    </svg>
+    <div class="hero-dots">
+      <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
+      <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
+      <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
+    </div>
 
     <div class="hr-glow"></div>
 
@@ -862,7 +839,7 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
     </div>
 
     <!-- Floating card C: community -->
-    <div class="fc fc-c" style="max-width:208px">
+    <div class="fc fc-c">
       <div class="fc-label">Community · Eventbrite</div>
       <div style="font-weight:700;font-size:.84rem;color:#162F4A;margin-bottom:3px">NoDa Art Walk · Sat</div>
       <div style="font-size:.7rem;color:#64748B;margin-bottom:8px">Free · 200 going</div>
@@ -1128,11 +1105,19 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
      PHOTO BANNER (UnboundX-style)
 ═══════════════════════════════ -->
 <section class="photo-banner">
-  <div class="pb-img" style="background-image:url('/images/friends_grabbing_coffee_2.jpg')">
+  <div class="pb-img">
+    <div class="pb-slide active" style="background-image:url('/images/pexelsrdne4921404.jpg')"></div>
+    <div class="pb-slide" style="background-image:url('/images/pexelsrdne4920851.jpg')"></div>
+    <div class="pb-slide" style="background-image:url('/images/pexelscottonbro7339201.jpg')"></div>
     <div class="pb-overlay"></div>
     <div class="pb-content">
       <div class="pb-headline">Find your people.<br>Find your place.</div>
       <a href="find.html" class="pb-cta">Start matching →</a>
+    </div>
+    <div class="pb-dots">
+      <button class="pb-dot active" data-index="0" aria-label="Slide 1"></button>
+      <button class="pb-dot" data-index="1" aria-label="Slide 2"></button>
+      <button class="pb-dot" data-index="2" aria-label="Slide 3"></button>
     </div>
   </div>
 </section>
@@ -1258,6 +1243,37 @@ demoForm.addEventListener('submit', e => {
       <div class="demo-success-title">You're on the list.</div>
       <p class="demo-success-sub">We'll reach out to ${email} within one business day to schedule your walkthrough.</p>
     </div>`;
+});
+
+// ─── Hero slideshow ───
+function initSlideshow(slides, dots, interval) {
+  if (!slides.length) return;
+  let current = 0;
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); resetTimer(); }));
+  let timer = setInterval(() => goTo(current + 1), interval);
+  function resetTimer() { clearInterval(timer); timer = setInterval(() => goTo(current + 1), interval); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Hero panel
+  initSlideshow(
+    [...document.querySelectorAll('.hero-slide')],
+    [...document.querySelectorAll('.hero-dot')],
+    5000
+  );
+  // Photo banner
+  initSlideshow(
+    [...document.querySelectorAll('.pb-slide')],
+    [...document.querySelectorAll('.pb-dot')],
+    6000
+  );
 });
 
 // ─── Neighborhood photo loader ───
