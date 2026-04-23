@@ -383,10 +383,14 @@ async function selectCategory(cat) {
   document.getElementById('panel-sub').textContent = `Searching near ${neighborhoodName}…`;
 
   try {
-    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&category=${cat.id}&radius=1609`;
+    const url = `${API_BASE}?lat=${neighborhoodCoords.lat}&lng=${neighborhoodCoords.lng}&type=${cat.id}&radius=1609`;
     const res  = await fetch(url);
     const data = await res.json();
-    const places = data.places || [];
+    const places = (data.results || []).map(p => ({
+  ...p,
+  open: p.open_now,
+  address: p.vicinity,
+   }));
 
     // Cache results
     placesCache[cat.id] = places;
