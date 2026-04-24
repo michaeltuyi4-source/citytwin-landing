@@ -150,7 +150,7 @@ app.http('places', {
     const lat      = parseFloat(params.get('lat'));
     const lng      = parseFloat(params.get('lng'));
     const category = params.get('type') || 'coffee';
-    const radius   = parseInt(params.get('radius') || '1609', 10);
+    const radius   = parseInt(params.get('radius') || '4827', 10);
 
     if (isNaN(lat) || isNaN(lng)) {
       return {
@@ -175,8 +175,11 @@ app.http('places', {
 
       if (useTextSearch) {
         // ── Text Search path ────────────────────────────────────────────────
+        // Coordinates are embedded in the query string as an additional location
+        // hint on top of the location+radius bias params. This double-signal keeps
+        // results near the neighborhood rather than drifting city-wide.
         searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
-        searchUrl.searchParams.set('query',    TEXT_SEARCH_QUERIES[category]);
+        searchUrl.searchParams.set('query',    `${TEXT_SEARCH_QUERIES[category]} near ${lat},${lng}`);
         searchUrl.searchParams.set('location', `${lat},${lng}`);
         searchUrl.searchParams.set('radius',   radius.toString());
         searchUrl.searchParams.set('key',      GOOGLE_KEY);
@@ -201,7 +204,7 @@ app.http('places', {
         place_id:  place.place_id,
         name:      place.name,
         rating:    place.rating || null,
-        vicinity:  place.vicinity,
+        vicinity:  place.formatted_address || place.vicinity,
         open_now:  place.opening_hours?.open_now ?? null,
         lat:       place.geometry?.location?.lat,
         lng:       place.geometry?.location?.lng,
