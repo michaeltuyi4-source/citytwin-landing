@@ -160,16 +160,35 @@ app.http('places', {
       };
     }
 
-    const placeType = CATEGORY_TYPES[category] || 'establishment';
-    const keyword   = CATEGORY_KEYWORDS[category] || null;
+    // ── Categories that use Text Search instead of Nearby Search ───────────────
+    // Nearby Search struggles with multi-keyword OR queries and broad concepts
+    // like "faith" or "international markets". Text Search handles these reliably.
+    const TEXT_SEARCH_QUERIES = {
+      faith:             'church OR mosque OR synagogue OR temple OR worship',
+      culturalDiversity: 'international grocery OR ethnic market OR asian market OR african market',
+    };
+
+    const useTextSearch = category in TEXT_SEARCH_QUERIES;
 
     try {
-      const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json');
-      searchUrl.searchParams.set('location', `${lat},${lng}`);
-      searchUrl.searchParams.set('radius', radius.toString());
-      searchUrl.searchParams.set('type', placeType);
-      if (keyword) searchUrl.searchParams.set('keyword', keyword);
-      searchUrl.searchParams.set('key', GOOGLE_KEY);
+      let searchUrl;
+
+      if (useTextSearch) {
+        // ── Text Search path ────────────────────────────────────────────────
+        searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
+        searchUrl.searchParams.set('query',    TEXT_SEARCH_QUERIES[category]);
+        searchUrl.searchParams.set('location', `${lat},${lng}`);
+        searchUrl.searchParams.set('radius',   radius.toString());
+        searchUrl.searchParams.set('key',      GOOGLE_KEY);
+      } else {
+        // ── Nearby Search path (all other categories) ───────────────────────
+        const placeType = CATEGORY_TYPES[category] || 'establishment';
+        searchUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json');
+        searchUrl.searchParams.set('location', `${lat},${lng}`);
+        searchUrl.searchParams.set('radius',   radius.toString());
+        searchUrl.searchParams.set('type',     placeType);
+        searchUrl.searchParams.set('key',      GOOGLE_KEY);
+      }
 
       const searchRes  = await fetch(searchUrl.toString());
       const searchData = await searchRes.json();
