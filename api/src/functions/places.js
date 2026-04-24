@@ -33,20 +33,28 @@ function corsHeaders(requestOrigin) {
   };
 }
 
-// ─── Category → Google Places type mapping ───────────────────────────────────
-const CATEGORY_QUERIES = {
-  coffee:        'coffee shop',
-  food:          'restaurant',
-  fitness:       'gym',
-  faith:         'church OR mosque OR synagogue OR temple',
-  outdoors:      'park',
-  nightlife:     'bar OR nightclub',
-  markets:       'international grocery store',
-  grocery:       'grocery store supermarket',
-  family:        'family activities playground',
-  shopping:      'shopping center mall',
-  entertainment: 'theater OR cinema OR entertainment',
-  trails:        'hiking trail OR nature trail',
+// ─── Category → Google Places API type values ────────────────────────────────
+// Uses the official Places API `type` parameter for precise filtering.
+const CATEGORY_TYPES = {
+  coffeeShops:       'cafe',
+  foodScene:         'restaurant',
+  fitness:           'gym',
+  faith:             'church',         // keyword fallback covers other faiths
+  outdoorSpaces:     'park',
+  nightlife:         'bar',
+  culturalDiversity: 'supermarket',    // keyword fallback narrows to intl markets
+  grocery:           'supermarket',
+  familyFriendly:    'playground',
+  shopping:          'shopping_mall',
+  entertainment:     'movie_theater',
+  trails:            'park',           // no dedicated trails type; park is closest
+};
+
+// ─── Keyword fallbacks for categories that need extra specificity ─────────────
+// Only applied when present — layered on top of the type param.
+const CATEGORY_KEYWORDS = {
+  faith:             'church mosque synagogue temple worship',
+  culturalDiversity: 'international grocery ethnic market',
 };
 
 // ─── MAIN HANDLER ─────────────────────────────────────────────────────────────
@@ -152,13 +160,15 @@ app.http('places', {
       };
     }
 
-    const keyword = CATEGORY_QUERIES[category] || category;
+    const placeType = CATEGORY_TYPES[category] || 'establishment';
+    const keyword   = CATEGORY_KEYWORDS[category] || null;
 
     try {
       const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json');
       searchUrl.searchParams.set('location', `${lat},${lng}`);
       searchUrl.searchParams.set('radius', radius.toString());
-      searchUrl.searchParams.set('keyword', keyword);
+      searchUrl.searchParams.set('type', placeType);
+      if (keyword) searchUrl.searchParams.set('keyword', keyword);
       searchUrl.searchParams.set('key', GOOGLE_KEY);
 
       const searchRes  = await fetch(searchUrl.toString());
@@ -168,7 +178,7 @@ app.http('places', {
         throw new Error(`Places API: ${searchData.status}`);
       }
 
-      const results = (searchData.results || []).slice(0, 10).map(place => ({
+      const results = (searchData.results || []).slice(0, 6).map(place => ({
         place_id:  place.place_id,
         name:      place.name,
         rating:    place.rating || null,
