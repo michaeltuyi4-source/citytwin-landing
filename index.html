@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CityTwin — Find the neighborhood where your life already exists</title>
+<title>CityTwin - Find the neighborhood where your life already exists</title>
 <!-- Security headers -->
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="DENY"/>
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://api.mapbox.com; img-src 'self' data: blob: https://*.mapbox.com https://maps.googleapis.com https://maps.gstatic.com https://lh3.googleusercontent.com; connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://citytwin-api.azurewebsites.net https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com;"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -905,17 +906,9 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
     <!-- Floating card C: community -->
     <div class="fc fc-c">
       <div class="fc-label">Community · Eventbrite</div>
-      <div style="font-weight:700;font-size:.84rem;color:#162F4A;margin-bottom:3px">NoDa Art Walk · Sat</div>
-      <div style="font-size:.7rem;color:#64748B;margin-bottom:8px">Free · 200 going</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="avs">
-          <div class="av av1"></div>
-          <div class="av av2"></div>
-          <div class="av av3"></div>
-          <div class="av av4"></div>
-        </div>
-        <span style="font-size:.64rem;color:#94A3B8">+196 others</span>
-      </div>
+      <div style="font-weight:700;font-size:.84rem;color:#162F4A;margin-bottom:3px">Weekend Events &amp; Things To Do</div>
+      <div style="font-size:.7rem;color:#64748B;margin-bottom:8px">Concerts, art walks, food markets &amp; more</div>
+      <a href="https://www.eventbrite.com/d/united-states/events/" target="_blank" rel="noopener" style="font-size:.68rem;font-weight:600;color:#C47B2B;text-decoration:none">Browse on Eventbrite →</a>
     </div>
 
     <div class="hr-fade"></div>
@@ -1192,32 +1185,34 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
 ═══════════════════════════════ -->
 <section class="community" id="community">
   <div class="comm-grid">
-    <div class="cc tall">
+    <a class="cc tall" href="https://www.meetup.com/find/?keywords=young+professionals" target="_blank" rel="noopener" style="text-decoration:none;display:flex;flex-direction:column;justify-content:space-between">
       <div>
         <div class="cc-src">Meetup</div>
-        <div class="cc-title">Charlotte Tech &amp; Coffee Mornings</div>
-        <div class="cc-meta">Every Tue · 8am · NoDa</div>
+        <div class="cc-title">Young Professionals Near You</div>
+        <div class="cc-meta">Browse groups in your new city</div>
       </div>
-      <div>
-        <div class="avs" style="margin-bottom:6px">
-          <div class="av av1"></div>
-          <div class="av av2"></div>
-          <div class="av av3"></div>
-          <div class="av av4"></div>
-        </div>
-        <div style="font-size:.7rem;color:var(--slate-400)">124 members going</div>
-      </div>
-    </div>
-    <div class="cc">
+      <div style="font-size:.72rem;font-weight:600;color:var(--amber);margin-top:14px">Explore on Meetup →</div>
+    </a>
+    <a class="cc" href="https://www.eventbrite.com/d/united-states/events/" target="_blank" rel="noopener" style="text-decoration:none;display:block">
       <div class="cc-src">Eventbrite</div>
-      <div class="cc-title">NoDa Art Walk — April Edition</div>
-      <div class="cc-meta">Sat Apr 26 · Free · 200 going</div>
-    </div>
-    <div class="cc">
+      <div class="cc-title">Weekend Events &amp; Things To Do</div>
+      <div class="cc-meta" style="margin-bottom:10px">Concerts, art walks, food markets &amp; more</div>
+      <div style="font-size:.72rem;font-weight:600;color:var(--amber)">Browse on Eventbrite →</div>
+    </a>
+    <a class="cc" href="https://www.meetup.com/find/?keywords=running+fitness" target="_blank" rel="noopener" style="text-decoration:none;display:block">
       <div class="cc-src">Meetup</div>
-      <div class="cc-title">Charlotte Runners — NoDa Loop</div>
-      <div class="cc-meta">Every Sun · 7am · 89 members</div>
-    </div>
+      <div class="cc-title">Running &amp; Fitness Groups</div>
+      <div class="cc-meta" style="margin-bottom:10px">Find your new workout crew</div>
+      <div style="font-size:.72rem;font-weight:600;color:var(--amber)">Find groups →</div>
+    </a>
+    <a class="cc" href="https://bucketlisters.com/experiences" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;grid-column:span 2">
+      <div>
+        <div class="cc-src">Bucketlisters</div>
+        <div class="cc-title">Hidden Gems &amp; Local Experiences</div>
+        <div class="cc-meta">Unique things to do in every city</div>
+      </div>
+      <div style="font-size:.72rem;font-weight:600;color:var(--amber);white-space:nowrap;margin-left:16px">Discover more →</div>
+    </a>
   </div>
 
   <div class="comm-copy">
