@@ -8,7 +8,7 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="DENY"/>
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://api.mapbox.com; img-src 'self' data: blob: https://*.mapbox.com https://maps.googleapis.com https://maps.gstatic.com https://lh3.googleusercontent.com; connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://citytwin-api.azurewebsites.net https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com;"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://api.mapbox.com; img-src 'self' data: blob: https://*.mapbox.com https://maps.googleapis.com https://maps.gstatic.com https://lh3.googleusercontent.com https://citytwin-api.azurewebsites.net https://*.googleapis.com https://streetviewpixels-pa.googleapis.com https://geo0.ggpht.com https://geo1.ggpht.com https://geo2.ggpht.com https://geo3.ggpht.com https://images.unsplash.com; connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://citytwin-api.azurewebsites.net https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com;"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -635,9 +635,7 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   .hero{grid-template-columns:1fr}
   .hero-right{min-height:420px}
   .hero-left{padding:60px 28px 36px}
-  .fc-a{display:none}
-  .fc-b{top:12%;right:auto;left:50%;transform:translateX(-50%);animation:none}
-  .fc-c{bottom:8%;left:50%;transform:translateX(-50%);animation:none}
+  .fc{display:none}
   .pin{display:none}
   .steps{grid-template-columns:1fr}
   .steps::before{display:none}
@@ -654,11 +652,6 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
 }
 @media(max-width:480px){
   .hero-right{min-height:360px}
-  .fc-b{top:8%}
-  .fc-c{bottom:5%}
-  .fc{padding:12px 14px;border-radius:14px}
-  .fc-name{font-size:.88rem}
-  .fc-bar-wrap{width:150px}
 }
 
 /* ─── DEMO MODAL ─── */
@@ -1206,6 +1199,9 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   <div class="comm-grid">
     <a class="cc tall" href="https://www.meetup.com/find/?keywords=young+professionals" target="_blank" rel="noopener" style="text-decoration:none;display:flex;flex-direction:column;justify-content:space-between">
       <div>
+        <div style="width:100%;height:110px;border-radius:10px;overflow:hidden;margin-bottom:14px;">
+          <img src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=160&fit=crop&auto=format" alt="Young professionals networking over coffee" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+        </div>
         <div class="cc-src">Meetup</div>
         <div class="cc-title">Young Professionals Near You</div>
         <div class="cc-meta">Browse groups in your new city</div>
@@ -1213,12 +1209,18 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
       <div style="font-size:.72rem;font-weight:600;color:var(--amber);margin-top:14px">Explore on Meetup →</div>
     </a>
     <a class="cc" href="https://www.eventbrite.com/d/united-states/events/" target="_blank" rel="noopener" style="text-decoration:none;display:block">
+      <div style="width:100%;height:100px;border-radius:10px;overflow:hidden;margin-bottom:12px;">
+        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=140&fit=crop&auto=format" alt="Art walk event with people viewing artwork" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+      </div>
       <div class="cc-src">Eventbrite</div>
       <div class="cc-title">Weekend Events &amp; Things To Do</div>
       <div class="cc-meta" style="margin-bottom:10px">Concerts, art walks, food markets &amp; more</div>
       <div style="font-size:.72rem;font-weight:600;color:var(--amber)">Browse on Eventbrite →</div>
     </a>
     <a class="cc" href="https://www.meetup.com/find/?keywords=running+fitness" target="_blank" rel="noopener" style="text-decoration:none;display:block">
+      <div style="width:100%;height:100px;border-radius:10px;overflow:hidden;margin-bottom:12px;">
+        <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=400&h=140&fit=crop&auto=format" alt="Running group in a neighborhood" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+      </div>
       <div class="cc-src">Meetup</div>
       <div class="cc-title">Running &amp; Fitness Groups</div>
       <div class="cc-meta" style="margin-bottom:10px">Find your new workout crew</div>
