@@ -8,7 +8,6 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="DENY"/>
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://api.mapbox.com; img-src 'self' data: blob: https://*.mapbox.com https://maps.googleapis.com https://maps.gstatic.com https://lh3.googleusercontent.com https://citytwin-api.azurewebsites.net https://*.googleapis.com https://streetviewpixels-pa.googleapis.com https://geo0.ggpht.com https://geo1.ggpht.com https://geo2.ggpht.com https://geo3.ggpht.com https://images.unsplash.com https://*.unsplash.com; connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://citytwin-api.azurewebsites.net https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com;"/>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -456,12 +455,12 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   padding:100px 64px;background:var(--brand-50);
   display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
 }
-.comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
 .cc{
   background:var(--white);border-radius:18px;padding:20px;
   box-shadow:0 2px 12px rgba(22,47,74,.07);border:1px solid var(--brand-100);
 }
-.cc.tall{grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between;max-height:340px}
+.cc.tall{grid-row:span 2;display:flex;flex-direction:column;height:100%;min-height:100%}
 .cc img{display:block}
 .cc-src{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
 .cc-title{font-family:var(--font-display);font-size:.92rem;color:var(--brand-900);line-height:1.4;margin-bottom:5px}
@@ -1200,7 +1199,7 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
   <div class="comm-grid">
     <a class="cc tall" href="https://www.meetup.com/find/?keywords=young+professionals" target="_blank" rel="noopener" style="text-decoration:none;display:flex;flex-direction:column;justify-content:space-between">
       <div>
-        <div style="width:100%;height:130px;border-radius:10px;overflow:hidden;margin-bottom:14px;">
+        <div style="width:100%;min-height:130px;border-radius:10px;overflow:hidden;margin-bottom:14px;">
           <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=360&h=180&fit=crop&crop=faces&auto=format" alt="Young professionals networking over coffee" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
         </div>
         <div class="cc-src">Meetup</div>
@@ -1227,13 +1226,18 @@ body{font-family:var(--font-body);background:var(--white);color:var(--brand-900)
       <div class="cc-meta" style="margin-bottom:10px">Find your new workout crew</div>
       <div style="font-size:.72rem;font-weight:600;color:var(--amber)">Find groups →</div>
     </a>
-    <a class="cc" href="https://bucketlisters.com/experiences" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;grid-column:span 2">
-      <div>
-        <div class="cc-src">Bucketlisters</div>
-        <div class="cc-title">Hidden Gems &amp; Local Experiences</div>
-        <div class="cc-meta">Unique things to do in every city</div>
+    <a class="cc" href="https://bucketlisters.com/experiences" target="_blank" rel="noopener" style="text-decoration:none;display:flex;flex-direction:column;grid-column:span 2">
+      <div style="width:100%;height:90px;border-radius:10px;overflow:hidden;margin-bottom:12px;">
+        <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&h=160&fit=crop&crop=center&auto=format" alt="People exploring a city neighborhood" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">
       </div>
-      <div style="font-size:.72rem;font-weight:600;color:var(--amber);white-space:nowrap;margin-left:16px">Discover more →</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="cc-src">Bucketlisters</div>
+          <div class="cc-title">Hidden Gems &amp; Local Experiences</div>
+          <div class="cc-meta">Unique things to do in every city</div>
+        </div>
+        <div style="font-size:.72rem;font-weight:600;color:var(--amber);white-space:nowrap;margin-left:16px">Discover more →</div>
+      </div>
     </a>
   </div>
 
